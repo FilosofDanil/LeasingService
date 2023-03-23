@@ -5,7 +5,7 @@ function App() {
     <div className="App">
       <header className="App-header">
         <p>
-          Made by Oleh Kovalets && Danyo Berkovkyy
+          Made by Oleh Kovalets && Danylo Berkovkyy
         </p>
       </header>
     </div>
