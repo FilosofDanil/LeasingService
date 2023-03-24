@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.sql.Date;
 
 @Entity
 @Table(name = "offers")
@@ -23,9 +23,9 @@ public class Offers {
     @Column (name="post_date", nullable=false)
     private Date post_date;
     @Column (name="cold_arend", nullable=false)
-    private Double cold_arend;
+    private Double coldArend;
     @Column (name="warm_arend", nullable=false)
-    private Double warm_arend;
+    private Double warmArend;
     @Column(name="description")
     private String description;
     @Column(name = "city", nullable = false)
