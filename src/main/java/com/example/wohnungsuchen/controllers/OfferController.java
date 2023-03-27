@@ -1,8 +1,12 @@
 package com.example.wohnungsuchen.controllers;
 
+import com.example.wohnungsuchen.auth.JwtAuthentication;
 import com.example.wohnungsuchen.models.OfferModel;
 import com.example.wohnungsuchen.postmodels.OfferPostModel;
+import com.example.wohnungsuchen.services.AuthService;
 import com.example.wohnungsuchen.services.OfferService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -11,14 +15,18 @@ import java.util.*;
 @RequestMapping("/v1/offers")
 public class OfferController {
     private final OfferService offerService;
+    private final AuthService authService;
 
-    public OfferController(OfferService offerService) {
+    public OfferController(OfferService offerService, AuthService authService) {
         this.offerService = offerService;
+        this.authService = authService;
     }
 
+    @PreAuthorize("hasAuthority('SEARCHER')")
     @GetMapping("/")
     public List<OfferModel>getAllOffers(){
-        return offerService.getAllOffers();
+        final JwtAuthentication authInfo = authService.getAuthInfo();
+        return ResponseEntity.ok(offerService.getAllOffers()).getBody();
     }
 
     @GetMapping("/{id}")
