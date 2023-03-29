@@ -22,7 +22,7 @@ public class OfferController {
         this.authService = authService;
     }
 
-    @PreAuthorize("hasAuthority('SEARCHER')")
+    @PreAuthorize("hasAuthority('LODGER')")
     @GetMapping("/")
     public List<OfferModel>getAllOffers(){
         final JwtAuthentication authInfo = authService.getAuthInfo();

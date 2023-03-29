@@ -2,6 +2,7 @@ package com.example.wohnungsuchen.services;
 
 import com.example.wohnungsuchen.auth.*;
 import com.example.wohnungsuchen.entities.Credits;
+import com.example.wohnungsuchen.models.User;
 import io.jsonwebtoken.Claims;
 import jakarta.security.auth.message.AuthException;
 import lombok.NonNull;
@@ -19,9 +20,9 @@ public class AuthService {
     private final JwtProvider jwtProvider;
 
     public JwtResponse login(@NonNull JwtRequest authRequest) throws AuthException {
-        final Credits credits = creditsService.getByLogin(authRequest.getLogin())
+        final User credits = creditsService.getByLogin(authRequest.getLogin())
                 .orElseThrow(() -> new AuthException("Пользователь не найден"));
-        if (credits.getPassword().equals(authRequest.getPassword())) {
+        if (credits.getProfile_password().equals(authRequest.getPassword())) {
             final String accessToken = jwtProvider.generateAccessToken(credits);
             final String refreshToken = jwtProvider.generateRefreshToken(credits);
             refreshStorage.put(credits.getEmail(), refreshToken);
@@ -37,7 +38,7 @@ public class AuthService {
             final String login = claims.getSubject();
             final String saveRefreshToken = refreshStorage.get(login);
             if (saveRefreshToken != null && saveRefreshToken.equals(refreshToken)) {
-                final Credits credits = creditsService.getByLogin(login)
+                final User credits = creditsService.getByLogin(login)
                         .orElseThrow(() -> new AuthException("Пользователь не найден"));
                 final String accessToken = jwtProvider.generateAccessToken(credits);
                 return new JwtResponse(accessToken, null);
@@ -52,7 +53,7 @@ public class AuthService {
             final String login = claims.getSubject();
             final String saveRefreshToken = refreshStorage.get(login);
             if (saveRefreshToken != null && saveRefreshToken.equals(refreshToken)) {
-                final Credits credits = creditsService.getByLogin(login)
+                final User credits = creditsService.getByLogin(login)
                         .orElseThrow(() -> new AuthException("Пользователь не найден"));
                 final String accessToken = jwtProvider.generateAccessToken(credits);
                 final String newRefreshToken = jwtProvider.generateRefreshToken(credits);
