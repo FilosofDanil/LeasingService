@@ -44,6 +44,7 @@ public class CreditsService {
             Searchers searcher = Searchers.builder()
                     .credits(credits)
                     .build();
+            searchersRepository.save(searcher);
         }
 
     }
