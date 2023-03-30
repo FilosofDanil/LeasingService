@@ -2,8 +2,11 @@ package com.example.wohnungsuchen.services;
 
 import com.example.wohnungsuchen.auth.Role;
 import com.example.wohnungsuchen.entities.Credits;
+import com.example.wohnungsuchen.entities.Lodgers;
+import com.example.wohnungsuchen.entities.Searchers;
 import com.example.wohnungsuchen.mappers.UserMapper;
 import com.example.wohnungsuchen.models.User;
+import com.example.wohnungsuchen.postmodels.UserPostModel;
 import com.example.wohnungsuchen.repositories.CreditsRepository;
 import com.example.wohnungsuchen.repositories.LodgersRepository;
 import com.example.wohnungsuchen.repositories.SearchersRepository;
@@ -25,6 +28,24 @@ public class CreditsService {
                 .stream()
                 .filter(credits -> login.equals(credits.getEmail()))
                 .findFirst();
+    }
+
+    public void sign_up(UserPostModel user){
+        Credits credits = UserMapper.toCredits(user);
+        creditsRepository.save(credits);
+        if(user.getRole().equals(Role.LODGER.getAuthority())){
+            Lodgers lodger = Lodgers.builder()
+                    .credits(credits)
+                    .build();
+            lodgersRepository.save(lodger);
+            return;
+        }
+        if(user.getRole().equals(Role.SEARCHER.getAuthority())){
+            Searchers searcher = Searchers.builder()
+                    .credits(credits)
+                    .build();
+        }
+
     }
 
     private List<User> getAllCredits() {

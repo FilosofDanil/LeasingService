@@ -21,7 +21,7 @@ public class Searchers {
     @JoinColumn(name = "credit_id", referencedColumnName = "id", nullable = false, unique = true)
     private Credits credits;
 
-    @Column(name = "city", nullable = false)
+    @Column(name = "city")
     private String city;
     public Searchers() {
     }

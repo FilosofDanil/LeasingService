@@ -3,6 +3,7 @@ package com.example.wohnungsuchen.services;
 import com.example.wohnungsuchen.auth.*;
 import com.example.wohnungsuchen.entities.Credits;
 import com.example.wohnungsuchen.models.User;
+import com.example.wohnungsuchen.postmodels.UserPostModel;
 import io.jsonwebtoken.Claims;
 import jakarta.security.auth.message.AuthException;
 import lombok.NonNull;
@@ -62,6 +63,10 @@ public class AuthService {
             }
         }
         throw new AuthException("Невалидный JWT токен");
+    }
+
+    public void signup(UserPostModel userPostModel){
+        creditsService.sign_up(userPostModel);
     }
 
     public JwtAuthentication getAuthInfo() {

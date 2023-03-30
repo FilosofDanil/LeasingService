@@ -3,6 +3,7 @@ package com.example.wohnungsuchen.controllers;
 import com.example.wohnungsuchen.auth.JwtRequest;
 import com.example.wohnungsuchen.auth.JwtResponse;
 import com.example.wohnungsuchen.auth.RefreshJwtRequest;
+import com.example.wohnungsuchen.postmodels.UserPostModel;
 import com.example.wohnungsuchen.services.AuthService;
 import jakarta.security.auth.message.AuthException;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
+
+    @PostMapping("signup")
+    public void signup(@RequestBody UserPostModel userPostModel){
+        authService.signup(userPostModel);
+    }
 
     @PostMapping("login")
     public ResponseEntity<JwtResponse> login(@RequestBody JwtRequest authRequest) throws AuthException {
