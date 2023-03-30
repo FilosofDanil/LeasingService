@@ -1,5 +1,6 @@
 package com.example.wohnungsuchen.entities;
 
+import com.example.wohnungsuchen.auth.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.Set;
 
 @Entity
 @Table(name = "credits")
