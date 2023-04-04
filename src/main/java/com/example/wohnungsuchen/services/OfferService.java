@@ -6,36 +6,31 @@ import com.example.wohnungsuchen.models.OfferModel;
 import com.example.wohnungsuchen.postmodels.OfferPostModel;
 import com.example.wohnungsuchen.repositories.ImagesRepository;
 import com.example.wohnungsuchen.repositories.OffersRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class OfferService {
     private final OffersRepository offersRepository;
     private final ImagesRepository imagesRepository;
 
-    public OfferService(OffersRepository offersRepository, ImagesRepository imagesRepository) {
-        this.offersRepository = offersRepository;
-        this.imagesRepository = imagesRepository;
-    }
-
     public List<OfferModel> getAllOffers() {
-        List<OfferModel> offerModels = new ArrayList<>();
-        offersRepository.findAll().forEach(offer -> {
-            offerModels.add(OfferMapper.toModel(offer));
-        });
-        return offerModels;
+        return getOffersList()
+                .stream()
+                .map(OfferMapper::toModel)
+                .collect(Collectors.toList());
     }
 
     public List<OfferModel> getOfferByCity(String city) {
-        List<OfferModel> offerModels = new ArrayList<>();
-        offersRepository.findAll().forEach(offer -> {
-            if (offer.getCity().equals(city)) {
-                offerModels.add(OfferMapper.toModel(offer));
-            }
-        });
-        return offerModels;
+        return getOffersList()
+                .stream()
+                .filter(offer -> offer.getCity().equals(city))
+                .map(OfferMapper::toModel)
+                .collect(Collectors.toList());
     }
 
     public void addOffer(OfferPostModel offerPostModel) {
@@ -78,7 +73,9 @@ public class OfferService {
 
     }
 
-    private void sort() {
-
+    private List<Offers> getOffersList(){
+        List<Offers> offers = new ArrayList<>();
+        offersRepository.findAll().forEach(offers::add);
+        return offers;
     }
 }
