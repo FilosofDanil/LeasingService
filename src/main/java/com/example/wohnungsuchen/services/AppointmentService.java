@@ -2,7 +2,6 @@ package com.example.wohnungsuchen.services;
 
 import com.example.wohnungsuchen.auxiliarymodels.AppointmentDeleteModel;
 import com.example.wohnungsuchen.entities.Appointments;
-import com.example.wohnungsuchen.mappers.AppointmentMapper;
 import com.example.wohnungsuchen.models.AppointmentModel;
 import com.example.wohnungsuchen.repositories.AppointmentsRepository;
 import lombok.RequiredArgsConstructor;
@@ -67,4 +66,21 @@ public class AppointmentService {
         appointmentsRepository.findAll().forEach(appointments::add);
         return appointments;
     }
+
+    static class AppointmentMapper {
+        private static AppointmentModel toModel(Appointments appointment){
+            return AppointmentModel.builder()
+                    .id(appointment.getId())
+                    .city(appointment.getOffer().getCity())
+                    .lodger_name(appointment.getLodger().getCredits().getProfile_name())
+                    .lodger_surname(appointment.getLodger().getCredits().getSurname())
+                    .address(appointment.getOffer().getAddress())
+                    .description(appointment.getDescription())
+                    .meeting_time(appointment.getMeeting_time())
+                    .meeting_date(appointment.getMeeting_date())
+                    .offer_title(appointment.getOffer().getTitle())
+                    .build();
+        }
+    }
+
 }

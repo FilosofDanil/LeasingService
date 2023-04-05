@@ -4,7 +4,6 @@ import com.example.wohnungsuchen.auth.Role;
 import com.example.wohnungsuchen.entities.Credits;
 import com.example.wohnungsuchen.entities.Lodgers;
 import com.example.wohnungsuchen.entities.Searchers;
-import com.example.wohnungsuchen.mappers.UserMapper;
 import com.example.wohnungsuchen.models.User;
 import com.example.wohnungsuchen.postmodels.UserPostModel;
 import com.example.wohnungsuchen.repositories.CreditsRepository;
@@ -69,5 +68,27 @@ public class CreditsService {
             }
         });
         return user;
+    }
+    static class UserMapper {
+        private static User format(Credits credits){
+            return User.builder()
+                    .profile_name(credits.getProfile_name())
+                    .profile_password(credits.getPassword())
+                    .surname(credits.getSurname())
+                    .email(credits.getEmail())
+                    .build();
+        }
+
+        private static Credits toCredits(UserPostModel user){
+            return Credits.builder()
+                    .profile_name(user.getProfile_name())
+                    .email(user.getEmail())
+                    .surname(user.getSurname())
+                    .phone(user.getPhone())
+                    .password(user.getPassword())
+                    .birthDate(user.getBirthDate())
+                    .verified(false)
+                    .build();
+        }
     }
 }

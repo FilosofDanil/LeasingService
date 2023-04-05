@@ -22,7 +22,7 @@ public class AuthService {
 
     public JwtResponse login(@NonNull JwtRequest authRequest) throws AuthException {
         final User credits = creditsService.getByLogin(authRequest.getLogin())
-                .orElseThrow(() -> new AuthException("Пользователь не найден"));
+                .orElseThrow(() -> new AuthException("User Not Found"));
         if (credits.getProfile_password().equals(authRequest.getPassword())) {
             final String accessToken = jwtProvider.generateAccessToken(credits);
             final String refreshToken = jwtProvider.generateRefreshToken(credits);
@@ -40,7 +40,7 @@ public class AuthService {
             final String saveRefreshToken = refreshStorage.get(login);
             if (saveRefreshToken != null && saveRefreshToken.equals(refreshToken)) {
                 final User credits = creditsService.getByLogin(login)
-                        .orElseThrow(() -> new AuthException("Пользователь не найден"));
+                        .orElseThrow(() -> new AuthException("User Not Found"));
                 final String accessToken = jwtProvider.generateAccessToken(credits);
                 return new JwtResponse(accessToken, null);
             }
@@ -55,7 +55,7 @@ public class AuthService {
             final String saveRefreshToken = refreshStorage.get(login);
             if (saveRefreshToken != null && saveRefreshToken.equals(refreshToken)) {
                 final User credits = creditsService.getByLogin(login)
-                        .orElseThrow(() -> new AuthException("Пользователь не найден"));
+                        .orElseThrow(() -> new AuthException("User Not Found"));
                 final String accessToken = jwtProvider.generateAccessToken(credits);
                 final String newRefreshToken = jwtProvider.generateRefreshToken(credits);
                 refreshStorage.put(credits.getEmail(), newRefreshToken);
