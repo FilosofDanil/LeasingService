@@ -3,6 +3,7 @@ package com.example.wohnungsuchen.controllers;
 import com.example.wohnungsuchen.auxiliarymodels.AppointmentDeleteModel;
 import com.example.wohnungsuchen.entities.Appointments;
 import com.example.wohnungsuchen.models.AppointmentModel;
+import com.example.wohnungsuchen.postmodels.AppointmentPostModel;
 import com.example.wohnungsuchen.services.AppointmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,19 +16,19 @@ import java.util.*;
 @RequiredArgsConstructor
 public class AppointmentController {
     private final AppointmentService appointmentService;
-    @PreAuthorize("hasAuthority('SEARCHER')")
     @GetMapping("/")
     public List<AppointmentModel> getAllAppointments() {
         return appointmentService.getAllAppointments();
     }
 
-    @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('SEARCHER')")
+    @GetMapping("/user/{id}")
     public List<AppointmentModel> getAppointmentsAssignedToCertainUser(@PathVariable Long id) {
         return appointmentService.getAppointmentsAssignedToCertainUser(id);
     }
 
     @PreAuthorize("hasAuthority('LODGER')")
-    @GetMapping("/{id}")
+    @GetMapping("/lodger/{id}")
     public List<AppointmentModel> getAppointmentsCreatedByCertainLodger(@PathVariable Long id) {
        return appointmentService.getAppointmentsCreatedByCertainLodger(id);
     }
@@ -53,9 +54,9 @@ public class AppointmentController {
         appointmentService.deleteAppointmentsByOfferAndTime(appointmentDeleteModel);
     }
 
-    @PutMapping
-    public void updateAppointment(){
-
+    @PutMapping("/{id}")
+    public void updateAppointment(@PathVariable Long id, @RequestBody AppointmentPostModel appointmentPostModel){
+        appointmentService.updateAppointment(appointmentPostModel, id);
     }
 
     @PatchMapping

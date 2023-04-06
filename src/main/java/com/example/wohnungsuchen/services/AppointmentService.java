@@ -3,6 +3,7 @@ package com.example.wohnungsuchen.services;
 import com.example.wohnungsuchen.auxiliarymodels.AppointmentDeleteModel;
 import com.example.wohnungsuchen.entities.Appointments;
 import com.example.wohnungsuchen.models.AppointmentModel;
+import com.example.wohnungsuchen.postmodels.AppointmentPostModel;
 import com.example.wohnungsuchen.repositories.AppointmentsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -53,11 +54,24 @@ public class AppointmentService {
                 .collect(Collectors.toList()));
     }
 
-    public void updateAppointment(){
-
+    public void updateAppointment(AppointmentPostModel appointmentPostModel, Long id) {
+        appointmentsRepository.findById(id)
+                .map(appointments -> {
+                    appointments.setDescription(appointmentPostModel.getDescription());
+                    appointments.setMeeting_time(appointmentPostModel.getMeeting_time());
+                    appointments.setMeeting_date(appointmentPostModel.getMeeting_date());
+                    appointments.setOffer(appointmentPostModel.getOffer());
+                    appointments.setLodger(appointmentPostModel.getLodger());
+                    appointments.setSearcher(appointmentPostModel.getSearcher());
+                    return appointmentsRepository.save(appointments);
+                })
+                .orElseGet(() -> {
+                    Appointments appointment = AppointmentMapper.toEntity(appointmentPostModel);
+                    return appointmentsRepository.save(appointment);
+                });
     }
 
-    public void partlyUpdateAppointment(){
+    public void partlyUpdateAppointment() {
 
     }
 
@@ -68,7 +82,7 @@ public class AppointmentService {
     }
 
     static class AppointmentMapper {
-        private static AppointmentModel toModel(Appointments appointment){
+        private static AppointmentModel toModel(Appointments appointment) {
             return AppointmentModel.builder()
                     .id(appointment.getId())
                     .city(appointment.getOffer().getCity())
@@ -79,6 +93,17 @@ public class AppointmentService {
                     .meeting_time(appointment.getMeeting_time())
                     .meeting_date(appointment.getMeeting_date())
                     .offer_title(appointment.getOffer().getTitle())
+                    .build();
+        }
+
+        private static Appointments toEntity(AppointmentPostModel appointmentPostModel) {
+            return Appointments.builder()
+                    .description(appointmentPostModel.getDescription())
+                    .meeting_time(appointmentPostModel.getMeeting_time())
+                    .meeting_date(appointmentPostModel.getMeeting_date())
+                    .offer(appointmentPostModel.getOffer())
+                    .lodger(appointmentPostModel.getLodger())
+                    .searcher(appointmentPostModel.getSearcher())
                     .build();
         }
     }
