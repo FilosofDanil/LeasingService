@@ -32,6 +32,8 @@ public class MailConfig {
         javaMailSender.setPassword(password);
         Properties properties = javaMailSender.getJavaMailProperties();
         properties.setProperty("mail.transport.protocol", protocol);
+        properties.setProperty("mail.smtp.auth", "true");
+        properties.setProperty("mail.smtp.ssl.enable", "true");
         properties.setProperty("mail.debug", debug);
         return javaMailSender;
     }

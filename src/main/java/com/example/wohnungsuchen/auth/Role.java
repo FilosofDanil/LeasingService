@@ -7,7 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 public enum Role implements GrantedAuthority {
 
     SEARCHER("SEARCHER"),
-    LODGER("LEASEHOLDER");
+    LEASEHOLDER("LEASEHOLDER");
 
     private final String vale;
 

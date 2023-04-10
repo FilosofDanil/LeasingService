@@ -74,7 +74,7 @@ public class AuthService {
     }
 
     public void activate(Long id, String code){
-
+        creditsService.activate(id, code);
     }
 
     public JwtAuthentication getAuthInfo() {

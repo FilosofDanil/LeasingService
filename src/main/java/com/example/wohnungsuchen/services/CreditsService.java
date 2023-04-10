@@ -34,9 +34,9 @@ public class CreditsService {
                 .findFirst();
     }
 
-    public void activate(Long id, String code){
+    public void activate(Long id, String code) {
         Credits credits = creditsRepository.findById(id).get();
-        if(isActivated(code)){
+        if (isActivated(code)) {
             credits.setVerified(true);
         }
         creditsRepository.save(credits);
@@ -51,7 +51,7 @@ public class CreditsService {
         credits.setActivationCode(UUID.randomUUID().toString());
         credits.setVerified(false);
         creditsRepository.save(credits);
-        if (user.getRole().equals(Role.LODGER.getAuthority())) {
+        if (user.getRole().equals(Role.LEASEHOLDER.getAuthority())) {
             Leaseholders lodger = Leaseholders.builder()
                     .credits(credits)
                     .build();
@@ -64,11 +64,11 @@ public class CreditsService {
                     .build();
             searchersRepository.save(searcher);
         }
-        if (!StringUtils.isEmpty(credits.getEmail())) {
-            String message = "china";
-        }
 
-        mailSender.send(credits.getEmail(),"REG","Sanchi");
+        mailSender.send(credits.getEmail(), "Profile Verification", "Hi! We're glad to see, that you have chosen our service. \n" +
+                "For a further partnership with you, it's required to verify your email \n" +
+                "To activate your account, you just need to click the link below \n"
+                + "http://localhost:8080/api/auth/" + credits.getId() + "/" + credits.getActivationCode());
     }
 
     private boolean isActivated(String code) {
@@ -84,7 +84,7 @@ public class CreditsService {
     private Credits setRoleToUser(Credits credits) {
         leaseholdersRepository.findAll().forEach(leaseholders -> {
             if (leaseholders.getCredits().equals(credits)) {
-                credits.setRoles(Collections.singleton(Role.LODGER));
+                credits.setRoles(Collections.singleton(Role.LEASEHOLDER));
             }
         });
         searchersRepository.findAll().forEach(searchers -> {
