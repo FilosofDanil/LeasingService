@@ -13,9 +13,9 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,12 +34,19 @@ public class CreditsService {
                 .findFirst();
     }
 
-    public void activate(Long id, String code) {
-        Credits credits = creditsRepository.findById(id).get();
+    public void activate(String code) {
         if (isActivated(code)) {
+            Credits credits = getAllCredits()
+                    .stream()
+                    .filter(credit -> credit.getActivationCode() != null)
+                    .collect(Collectors.toList())
+                    .stream()
+                    .filter(credit -> credit.getActivationCode().equals(code))
+                    .findFirst().get();
             credits.setVerified(true);
+            credits.setActivationCode(null);
+            creditsRepository.save(credits);
         }
-        creditsRepository.save(credits);
     }
 
     public void sign_up(UserPostModel user) {
@@ -68,11 +75,11 @@ public class CreditsService {
         mailSender.send(credits.getEmail(), "Profile Verification", "Hi! We're glad to see, that you have chosen our service. \n" +
                 "For a further partnership with you, it's required to verify your email \n" +
                 "To activate your account, you just need to click the link below \n"
-                + "http://localhost:8080/api/auth/" + credits.getId() + "/" + credits.getActivationCode());
+                + "http://localhost:8080/api/auth/activate/" + credits.getActivationCode());
     }
 
     private boolean isActivated(String code) {
-        return getAllCredits().stream().anyMatch(credits -> credits.getActivationCode().equals(code));
+        return getAllCredits().stream().filter(credits -> credits.getActivationCode() != null).anyMatch(credits -> credits.getActivationCode().equals(code));
     }
 
     private List<Credits> getAllCredits() {

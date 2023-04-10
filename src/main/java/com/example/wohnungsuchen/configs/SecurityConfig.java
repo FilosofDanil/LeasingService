@@ -28,7 +28,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeHttpRequests(
                         authz -> authz
-                                .requestMatchers("/api/auth/**","/api/auth/activate/**/**").permitAll()
+                                .requestMatchers("/api/auth/**","/api/auth/activate/*").permitAll()
                                 .anyRequest().authenticated()
                                 .and()
                                 .addFilterAfter(jwtFilter, UsernamePasswordAuthenticationFilter.class)

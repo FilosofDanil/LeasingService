@@ -73,8 +73,8 @@ public class AuthService {
         creditsService.sign_up(userPostModel);
     }
 
-    public void activate(Long id, String code){
-        creditsService.activate(id, code);
+    public void activate(String code){
+        creditsService.activate(code);
     }
 
     public JwtAuthentication getAuthInfo() {

@@ -40,9 +40,9 @@ public class AuthController {
         return ResponseEntity.ok(token);
     }
 
-    @GetMapping("activate/{id}/{code}")
-    public void activate(@PathVariable String code, @PathVariable Long id){
-        authService.activate(id,code);
+    @GetMapping("activate/{code}")
+    public void activate(@PathVariable String code){
+        authService.activate(code);
     }
 
 }
