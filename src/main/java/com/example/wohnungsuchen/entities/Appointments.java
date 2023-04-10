@@ -28,8 +28,8 @@ public class Appointments {
     private Searchers searcher;
 
     @ManyToOne()
-    @JoinColumn(name = "lodger_id", referencedColumnName = "id", nullable = false)
-    private Lodgers lodger;
+    @JoinColumn(name = "leaseholder_id", referencedColumnName = "id", nullable = false)
+    private Leaseholders leaseholder;
 
     @Column(name = "meeting_date",nullable = false)
     private Date meeting_date;

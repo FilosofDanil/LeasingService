@@ -27,13 +27,13 @@ public class AppointmentController {
         return appointmentService.getAppointmentsAssignedToCertainUser(id);
     }
 
-    @PreAuthorize("hasAuthority('LODGER')")
-    @GetMapping("/lodger/{id}")
-    public List<AppointmentModel> getAppointmentsCreatedByCertainLodger(@PathVariable Long id) {
-       return appointmentService.getAppointmentsCreatedByCertainLodger(id);
+    @PreAuthorize("hasAuthority('LEASEHOLDER')")
+    @GetMapping("/Leaseholder/{id}")
+    public List<AppointmentModel> getAppointmentsCreatedByCertainLeaseholder(@PathVariable Long id) {
+       return appointmentService.getAppointmentsCreatedByCertainLeaseholder(id);
     }
 
-    @PreAuthorize("hasAuthority('LODGER')")
+    @PreAuthorize("hasAuthority('LEASEHOLDER')")
     @PostMapping("/")
     public void assignAppointment(){
 

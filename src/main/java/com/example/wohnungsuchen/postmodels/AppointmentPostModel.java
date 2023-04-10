@@ -1,6 +1,6 @@
 package com.example.wohnungsuchen.postmodels;
 
-import com.example.wohnungsuchen.entities.Lodgers;
+import com.example.wohnungsuchen.entities.Leaseholders;
 import com.example.wohnungsuchen.entities.Offers;
 import com.example.wohnungsuchen.entities.Searchers;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -24,7 +24,7 @@ public class AppointmentPostModel {
     @JsonProperty("description")
     private String description;
     @JsonProperty("lodger")
-    private Lodgers lodger;
+    private Leaseholders leaseholder;
     @JsonProperty("offer")
     private Offers offer;
     @JsonProperty("searcher")

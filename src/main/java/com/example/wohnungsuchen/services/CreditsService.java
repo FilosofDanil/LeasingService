@@ -2,11 +2,11 @@ package com.example.wohnungsuchen.services;
 
 import com.example.wohnungsuchen.auth.Role;
 import com.example.wohnungsuchen.entities.Credits;
-import com.example.wohnungsuchen.entities.Lodgers;
+import com.example.wohnungsuchen.entities.Leaseholders;
 import com.example.wohnungsuchen.entities.Searchers;
 import com.example.wohnungsuchen.postmodels.UserPostModel;
 import com.example.wohnungsuchen.repositories.CreditsRepository;
-import com.example.wohnungsuchen.repositories.LodgersRepository;
+import com.example.wohnungsuchen.repositories.LeaseholdersRepository;
 import com.example.wohnungsuchen.repositories.SearchersRepository;
 import com.example.wohnungsuchen.security.MailSender;
 import lombok.NonNull;
@@ -21,7 +21,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class CreditsService {
     private final CreditsRepository creditsRepository;
-    private final LodgersRepository lodgersRepository;
+    private final LeaseholdersRepository leaseholdersRepository;
     private final SearchersRepository searchersRepository;
 
     @Autowired
@@ -52,10 +52,10 @@ public class CreditsService {
         credits.setVerified(false);
         creditsRepository.save(credits);
         if (user.getRole().equals(Role.LODGER.getAuthority())) {
-            Lodgers lodger = Lodgers.builder()
+            Leaseholders lodger = Leaseholders.builder()
                     .credits(credits)
                     .build();
-            lodgersRepository.save(lodger);
+            leaseholdersRepository.save(lodger);
             return;
         }
         if (user.getRole().equals(Role.SEARCHER.getAuthority())) {
@@ -82,8 +82,8 @@ public class CreditsService {
     }
 
     private Credits setRoleToUser(Credits credits) {
-        lodgersRepository.findAll().forEach(lodgers -> {
-            if (lodgers.getCredits().equals(credits)) {
+        leaseholdersRepository.findAll().forEach(leaseholders -> {
+            if (leaseholders.getCredits().equals(credits)) {
                 credits.setRoles(Collections.singleton(Role.LODGER));
             }
         });

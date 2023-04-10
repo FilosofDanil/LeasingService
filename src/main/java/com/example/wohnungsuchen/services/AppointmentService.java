@@ -8,8 +8,8 @@ import com.example.wohnungsuchen.repositories.AppointmentsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.function.Function;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,9 +30,9 @@ public class AppointmentService {
 
     }
 
-    public List<AppointmentModel> getAppointmentsCreatedByCertainLodger(Long id) {
+    public List<AppointmentModel> getAppointmentsCreatedByCertainLeaseholder(Long id) {
         return getAppointmentList().stream()
-                .filter(appointment -> appointment.getLodger().getId().equals(id))
+                .filter(appointment -> appointment.getLeaseholder().getId().equals(id))
                 .map(AppointmentMapper::toModel)
                 .collect(Collectors.toList());
     }
@@ -61,7 +61,7 @@ public class AppointmentService {
                     appointments.setMeeting_time(appointmentPostModel.getMeeting_time());
                     appointments.setMeeting_date(appointmentPostModel.getMeeting_date());
                     appointments.setOffer(appointmentPostModel.getOffer());
-                    appointments.setLodger(appointmentPostModel.getLodger());
+                    appointments.setLeaseholder(appointmentPostModel.getLeaseholder());
                     appointments.setSearcher(appointmentPostModel.getSearcher());
                     return appointmentsRepository.save(appointments);
                 })
@@ -86,8 +86,8 @@ public class AppointmentService {
             return AppointmentModel.builder()
                     .id(appointment.getId())
                     .city(appointment.getOffer().getCity())
-                    .lodger_name(appointment.getLodger().getCredits().getProfile_name())
-                    .lodger_surname(appointment.getLodger().getCredits().getSurname())
+                    .leaseholder_name(appointment.getLeaseholder().getCredits().getProfile_name())
+                    .leaseholder_surname(appointment.getLeaseholder().getCredits().getSurname())
                     .address(appointment.getOffer().getAddress())
                     .description(appointment.getDescription())
                     .meeting_time(appointment.getMeeting_time())
@@ -102,7 +102,7 @@ public class AppointmentService {
                     .meeting_time(appointmentPostModel.getMeeting_time())
                     .meeting_date(appointmentPostModel.getMeeting_date())
                     .offer(appointmentPostModel.getOffer())
-                    .lodger(appointmentPostModel.getLodger())
+                    .leaseholder(appointmentPostModel.getLeaseholder())
                     .searcher(appointmentPostModel.getSearcher())
                     .build();
         }

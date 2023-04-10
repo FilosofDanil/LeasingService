@@ -8,7 +8,8 @@ import com.example.wohnungsuchen.repositories.OffersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -61,7 +62,7 @@ public class OfferService {
                     offers.setTitle(offer.getTitle());
                     return offersRepository.save(offers);
                 })
-                .orElseGet(() ->{
+                .orElseGet(() -> {
                     Offers offers = OfferMapper.toOffer(offer);
                     offers.setId(id);
                     return offersRepository.save(offers);
@@ -72,13 +73,14 @@ public class OfferService {
 
     }
 
-    private List<Offers> getOffersList(){
+    private List<Offers> getOffersList() {
         List<Offers> offers = new ArrayList<>();
         offersRepository.findAll().forEach(offers::add);
         return offers;
     }
+
     static class OfferMapper {
-        private static OfferModel toModel(Offers offer){
+        private static OfferModel toModel(Offers offer) {
             return OfferModel.builder()
                     .id(offer.getId())
                     .address(offer.getCity())
@@ -97,7 +99,7 @@ public class OfferService {
                     .build();
         }
 
-        private static Offers toOffer(OfferPostModel offer){
+        private static Offers toOffer(OfferPostModel offer) {
             return Offers.builder()
                     .address(offer.getCity())
                     .area(offer.getArea())

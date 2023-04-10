@@ -23,10 +23,10 @@ public class AppointmentModel {
     private Time meeting_time;
     @JsonProperty("description")
     private String description;
-    @JsonProperty("lodger_name")
-    private String lodger_name;
-    @JsonProperty("lodger_surname")
-    private String lodger_surname;
+    @JsonProperty("leaseholder_name")
+    private String leaseholder_name;
+    @JsonProperty("leaseholder_surname")
+    private String leaseholder_surname;
     @JsonProperty("offer_title")
     private String offer_title;
     @JsonProperty("city")
