@@ -1,8 +1,10 @@
 package com.example.wohnungsuchen.services;
 
-import com.example.wohnungsuchen.auth.*;
+import com.example.wohnungsuchen.auth.JwtAuthentication;
+import com.example.wohnungsuchen.auth.JwtProvider;
+import com.example.wohnungsuchen.auth.JwtRequest;
+import com.example.wohnungsuchen.auth.JwtResponse;
 import com.example.wohnungsuchen.entities.Credits;
-import com.example.wohnungsuchen.models.User;
 import com.example.wohnungsuchen.postmodels.UserPostModel;
 import io.jsonwebtoken.Claims;
 import jakarta.security.auth.message.AuthException;
@@ -10,7 +12,9 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import java.util.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -21,9 +25,9 @@ public class AuthService {
     private final JwtProvider jwtProvider;
 
     public JwtResponse login(@NonNull JwtRequest authRequest) throws AuthException {
-        final User credits = creditsService.getByLogin(authRequest.getLogin())
-                .orElseThrow(() -> new AuthException("Пользователь не найден"));
-        if (credits.getProfile_password().equals(authRequest.getPassword())) {
+        final Credits credits = creditsService.getByLogin(authRequest.getLogin())
+                .orElseThrow(() -> new AuthException("User Not Found"));
+        if (credits.getPassword().equals(authRequest.getPassword())) {
             final String accessToken = jwtProvider.generateAccessToken(credits);
             final String refreshToken = jwtProvider.generateRefreshToken(credits);
             refreshStorage.put(credits.getEmail(), refreshToken);
@@ -39,8 +43,8 @@ public class AuthService {
             final String login = claims.getSubject();
             final String saveRefreshToken = refreshStorage.get(login);
             if (saveRefreshToken != null && saveRefreshToken.equals(refreshToken)) {
-                final User credits = creditsService.getByLogin(login)
-                        .orElseThrow(() -> new AuthException("Пользователь не найден"));
+                final Credits credits = creditsService.getByLogin(login)
+                        .orElseThrow(() -> new AuthException("User Not Found"));
                 final String accessToken = jwtProvider.generateAccessToken(credits);
                 return new JwtResponse(accessToken, null);
             }
@@ -54,8 +58,8 @@ public class AuthService {
             final String login = claims.getSubject();
             final String saveRefreshToken = refreshStorage.get(login);
             if (saveRefreshToken != null && saveRefreshToken.equals(refreshToken)) {
-                final User credits = creditsService.getByLogin(login)
-                        .orElseThrow(() -> new AuthException("Пользователь не найден"));
+                final Credits credits = creditsService.getByLogin(login)
+                        .orElseThrow(() -> new AuthException("User Not Found"));
                 final String accessToken = jwtProvider.generateAccessToken(credits);
                 final String newRefreshToken = jwtProvider.generateRefreshToken(credits);
                 refreshStorage.put(credits.getEmail(), newRefreshToken);
@@ -67,6 +71,10 @@ public class AuthService {
 
     public void signup(UserPostModel userPostModel){
         creditsService.sign_up(userPostModel);
+    }
+
+    public void activate(String code){
+        creditsService.activate(code);
     }
 
     public JwtAuthentication getAuthInfo() {

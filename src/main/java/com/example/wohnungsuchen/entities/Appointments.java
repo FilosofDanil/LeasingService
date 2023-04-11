@@ -27,6 +27,10 @@ public class Appointments {
     @JoinColumn(name = "searcher_id", referencedColumnName = "id", nullable = false)
     private Searchers searcher;
 
+    @ManyToOne()
+    @JoinColumn(name = "leaseholder_id", referencedColumnName = "id", nullable = false)
+    private Leaseholders leaseholder;
+
     @Column(name = "meeting_date",nullable = false)
     private Date meeting_date;
     @Column(name = "meeting_time",nullable = false)

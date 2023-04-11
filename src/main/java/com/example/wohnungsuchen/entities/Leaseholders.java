@@ -7,12 +7,12 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "lodgers")
+@Table(name = "leaseholders")
 @Setter
 @Getter
 @AllArgsConstructor
 @Builder
-public class Lodgers {
+public class Leaseholders {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,6 +23,6 @@ public class Lodgers {
 
     @Column(name = "firma_name")
     private String firma_name;
-    public Lodgers() {
+    public Leaseholders() {
     }
 }
