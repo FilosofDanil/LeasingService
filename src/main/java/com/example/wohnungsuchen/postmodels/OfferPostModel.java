@@ -48,4 +48,7 @@ public class OfferPostModel {
 
     @JsonProperty("image_link")
     private String link;
+
+    @JsonProperty("leaseholder_id")
+    private Long leaseholder_id;
 }

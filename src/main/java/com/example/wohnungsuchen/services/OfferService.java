@@ -1,10 +1,13 @@
 package com.example.wohnungsuchen.services;
 
 import com.example.wohnungsuchen.entities.Offers;
+import com.example.wohnungsuchen.entities.Posted;
 import com.example.wohnungsuchen.models.OfferModel;
 import com.example.wohnungsuchen.postmodels.OfferPostModel;
 import com.example.wohnungsuchen.repositories.ImagesRepository;
+import com.example.wohnungsuchen.repositories.LeaseholdersRepository;
 import com.example.wohnungsuchen.repositories.OffersRepository;
+import com.example.wohnungsuchen.repositories.PostedRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +18,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class OfferService {
     private final OffersRepository offersRepository;
+    private final PostedRepository postedRepository;
     private final ImagesRepository imagesRepository;
+    private final LeaseholdersRepository leaseholdersRepository;
 
     public List<OfferModel> getAllOffers() {
         return getOffersList()
@@ -42,6 +47,10 @@ public class OfferService {
         Date postDate = new Date();
         offer.setPost_date(postDate);
         offersRepository.save(offer);
+        postedRepository.save(Posted.builder()
+                .leaseholder(leaseholdersRepository.findById(offerPostModel.getLeaseholder_id()).get())
+                .offer(offer)
+                .build());
     }
 
     public void deleteOffer(Long id) {
@@ -50,7 +59,7 @@ public class OfferService {
 
     public void updateOffer(Long id, OfferPostModel offer) {
         offersRepository.findById(id).map(offers -> {
-                    offers.setAddress(offer.getCity());
+                    offers.setAddress(offer.getAddress());
                     offers.setArea(offer.getArea());
                     offers.setBalkoon(offer.getBalkoon());
                     offers.setCity(offer.getCity());
@@ -70,8 +79,40 @@ public class OfferService {
                 });
     }
 
-    public void partlyUpdateOffer() {
-
+    public void partlyUpdateOffer(Long id, OfferPostModel offer) {
+        offersRepository.findById(id).map(offers -> {
+            if(offer.getCity()!=null){
+                offers.setCity(offer.getCity());
+            }
+            if(offer.getArea()!=null){
+                offers.setArea(offer.getArea());
+            }
+            if(offer.getBalkoon()!=null){
+                offers.setBalkoon(offer.getBalkoon());
+            }
+            if(offer.getColdArend()!=null){
+                offers.setColdArend(offer.getColdArend());
+            }
+            if(offer.getAddress()!=null){
+                offers.setAddress(offer.getAddress());
+            }
+            if(offer.getRooms()!=null){
+                offers.setRooms(offer.getRooms());
+            }
+            if(offer.getFloor()!=null){
+                offers.setFloor(offer.getFloor());
+            }
+            if(offer.getDescription()!=null){
+                offers.setDescription(offer.getDescription());
+            }
+            if(offer.getInternet()!=null){
+                offers.setInternet(offer.getInternet());
+            }
+            if(offer.getTitle()!=null){
+                offers.setTitle(offer.getTitle());
+            }
+            return offersRepository.save(offers);
+        });
     }
 
     private List<Offers> getOffersList() {
@@ -84,7 +125,7 @@ public class OfferService {
         private static OfferModel toModel(Offers offer) {
             return OfferModel.builder()
                     .id(offer.getId())
-                    .address(offer.getCity())
+                    .address(offer.getAddress())
                     .area(offer.getArea())
                     .balkoon(offer.getBalkoon())
                     .link(offer.getImage().getLink())
@@ -102,7 +143,7 @@ public class OfferService {
 
         private static Offers toOffer(OfferPostModel offer) {
             return Offers.builder()
-                    .address(offer.getCity())
+                    .address(offer.getAddress())
                     .area(offer.getArea())
                     .balkoon(offer.getBalkoon())
                     .city(offer.getCity())

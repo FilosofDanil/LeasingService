@@ -18,7 +18,7 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-public class CreditsService {
+public class CredentialsService {
     private final CredentialsRepository credentialsRepository;
     private final LeaseholdersRepository leaseholdersRepository;
     private final SearchersRepository searchersRepository;
@@ -102,6 +102,21 @@ public class CreditsService {
             }
         });
         return credentials;
+    }
+
+    public void deleteCredentials(Long id){
+        Credentials credentials = credentialsRepository.findById(id).get();
+        leaseholdersRepository.findAll().forEach(leaseholders -> {
+            if (leaseholders.getCredentials().equals(credentials)) {
+                leaseholdersRepository.delete(leaseholders);
+            }
+        });
+        searchersRepository.findAll().forEach(searchers -> {
+            if (searchers.getCredentials().equals(credentials)) {
+                searchersRepository.delete(searchers);
+            }
+        });
+        credentialsRepository.deleteById(id);
     }
 
     static class UserMapper {

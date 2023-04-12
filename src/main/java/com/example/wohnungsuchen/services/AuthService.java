@@ -20,12 +20,12 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final CreditsService creditsService;
+    private final CredentialsService credentialsService;
     private final Map<String, String> refreshStorage = new HashMap<>();
     private final JwtProvider jwtProvider;
 
     public JwtResponse login(@NonNull JwtRequest authRequest) throws AuthException {
-        final Credentials credentials = creditsService.getByLogin(authRequest.getLogin())
+        final Credentials credentials = credentialsService.getByLogin(authRequest.getLogin())
                 .orElseThrow(() -> new AuthException("User Not Found"));
         if (credentials.getPassword().equals(authRequest.getPassword()) && credentials.getVerified()) {
             final String accessToken = jwtProvider.generateAccessToken(credentials);
@@ -43,7 +43,7 @@ public class AuthService {
             final String login = claims.getSubject();
             final String saveRefreshToken = refreshStorage.get(login);
             if (saveRefreshToken != null && saveRefreshToken.equals(refreshToken)) {
-                final Credentials credentials = creditsService.getByLogin(login)
+                final Credentials credentials = credentialsService.getByLogin(login)
                         .orElseThrow(() -> new AuthException("User Not Found"));
                 final String accessToken = jwtProvider.generateAccessToken(credentials);
                 return new JwtResponse(accessToken, null);
@@ -58,7 +58,7 @@ public class AuthService {
             final String login = claims.getSubject();
             final String saveRefreshToken = refreshStorage.get(login);
             if (saveRefreshToken != null && saveRefreshToken.equals(refreshToken)) {
-                final Credentials credentials = creditsService.getByLogin(login)
+                final Credentials credentials = credentialsService.getByLogin(login)
                         .orElseThrow(() -> new AuthException("User Not Found"));
                 final String accessToken = jwtProvider.generateAccessToken(credentials);
                 final String newRefreshToken = jwtProvider.generateRefreshToken(credentials);
@@ -70,11 +70,11 @@ public class AuthService {
     }
 
     public void signup(UserPostModel userPostModel){
-        creditsService.sign_up(userPostModel);
+        credentialsService.sign_up(userPostModel);
     }
 
     public void activate(String code){
-        creditsService.activate(code);
+        credentialsService.activate(code);
     }
 
     public void sendActivationCode(){
