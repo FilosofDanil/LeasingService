@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,19 +29,14 @@ public class CreditsService {
     public Optional<Credits> getByLogin(@NonNull String login) {
         return getAllCredits()
                 .stream()
+                .map(this::setRoleToUser)
                 .filter(credits -> login.equals(credits.getEmail()))
                 .findFirst();
     }
 
     public void activate(String code) {
         if (isActivated(code)) {
-            Credits credits = getAllCredits()
-                    .stream()
-                    .filter(credit -> credit.getActivationCode() != null)
-                    .collect(Collectors.toList())
-                    .stream()
-                    .filter(credit -> credit.getActivationCode().equals(code))
-                    .findFirst().get();
+            Credits credits = creditsRepository.findCreditsByActivationCode(code);
             credits.setVerified(true);
             credits.setActivationCode(null);
             creditsRepository.save(credits);
@@ -71,7 +65,15 @@ public class CreditsService {
                     .build();
             searchersRepository.save(searcher);
         }
+        setRoleToUser(credits);
+        sendActivationCodeAssistant(credits);
+    }
 
+    public void sendActivationCode() {
+
+    }
+
+    private void sendActivationCodeAssistant(Credits credits) {
         mailSender.send(credits.getEmail(), "Profile Verification", "Hi! We're glad to see, that you have chosen our service. \n" +
                 "For a further partnership with you, it's required to verify your email \n" +
                 "To activate your account, you just need to click the link below \n"
@@ -84,7 +86,7 @@ public class CreditsService {
 
     private List<Credits> getAllCredits() {
         List<Credits> creditsList = new ArrayList<>();
-        creditsRepository.findAll().forEach(credits -> creditsList.add(setRoleToUser(credits)));
+        creditsRepository.findAll().forEach(creditsList::add);
         return creditsList;
     }
 

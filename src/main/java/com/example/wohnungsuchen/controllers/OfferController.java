@@ -60,6 +60,6 @@ public class OfferController {
     @PreAuthorize("hasAuthority('LEASEHOLDER')")
     @PatchMapping
     public void partlyUpdateOffer(@PathVariable Long id, @RequestBody OfferPostModel offerPostModel) {
-
+        offerService.updateOffer(id, offerPostModel);
     }
 }

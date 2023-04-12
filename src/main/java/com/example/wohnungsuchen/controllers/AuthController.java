@@ -45,4 +45,8 @@ public class AuthController {
         authService.activate(code);
     }
 
+    @PostMapping("send")
+    public void sendActivationCode(){
+        authService.sendActivationCode();
+    }
 }

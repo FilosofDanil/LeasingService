@@ -27,7 +27,7 @@ public class AuthService {
     public JwtResponse login(@NonNull JwtRequest authRequest) throws AuthException {
         final Credits credits = creditsService.getByLogin(authRequest.getLogin())
                 .orElseThrow(() -> new AuthException("User Not Found"));
-        if (credits.getPassword().equals(authRequest.getPassword())) {
+        if (credits.getPassword().equals(authRequest.getPassword()) && credits.getVerified()) {
             final String accessToken = jwtProvider.generateAccessToken(credits);
             final String refreshToken = jwtProvider.generateRefreshToken(credits);
             refreshStorage.put(credits.getEmail(), refreshToken);
@@ -75,6 +75,10 @@ public class AuthService {
 
     public void activate(String code){
         creditsService.activate(code);
+    }
+
+    public void sendActivationCode(){
+
     }
 
     public JwtAuthentication getAuthInfo() {
