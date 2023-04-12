@@ -6,21 +6,20 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import net.minidev.json.annotate.JsonIgnore;
-import org.hibernate.annotations.CollectionType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Set;
 
 @Entity
-@Table(name = "credits")
+@Table(name = "сredentials")
 @Setter
 @Getter
 @AllArgsConstructor
 @Builder
-public class Credits implements UserDetails {
-
+public class Credentials implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -36,15 +35,14 @@ public class Credits implements UserDetails {
     private Date birthDate;
     @Column(name ="profile_password", nullable = false)
     private String password;
-    @Column(name="verified", nullable = true)
+    @Column(name="verified")
     private Boolean verified;
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
-    @CollectionTable(name="credits_roles", joinColumns = @JoinColumn(columnDefinition = "credits_id"))
     @Enumerated(EnumType.STRING)
     private Set<Role> roles;
-    @Column(name = "activation_code", nullable = true)
+    @Column(name = "activation_code")
     private String activationCode;
-    public Credits() {
+    public Credentials() {
     }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

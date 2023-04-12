@@ -19,7 +19,7 @@ public class Leaseholders {
 
     @OneToOne
     @JoinColumn(name = "credit_id", referencedColumnName = "id", nullable = false, unique = true)
-    private Credits credits;
+    private Credentials credentials;
 
     @Column(name = "firma_name")
     private String firma_name;

@@ -8,8 +8,7 @@ import com.example.wohnungsuchen.repositories.OffersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,6 +39,8 @@ public class OfferService {
                 offer.setImage(images);
             }
         });
+        Date postDate = new Date();
+        offer.setPost_date(postDate);
         offersRepository.save(offer);
     }
 

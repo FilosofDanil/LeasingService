@@ -19,7 +19,7 @@ public class Searchers {
 
     @OneToOne
     @JoinColumn(name = "credit_id", referencedColumnName = "id", nullable = false, unique = true)
-    private Credits credits;
+    private Credentials credentials;
 
     @Column(name = "city")
     private String city;
