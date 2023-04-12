@@ -3,9 +3,12 @@ body {
 }
 
 .wrapper {
-  padding: 50px 0 30px 180px;
-  opacity: 80%;
-  width: 75%;
+  padding-top: 20px;
+  background-image: url("../images/homes-for-rent.png");
+  opacity: 30%;
+  background-size: cover;
+  background-repeat: no-repeat;
+  height: 670px;
 }
 
 .navbar-list {
@@ -16,19 +19,28 @@ body {
   padding: 0;
   /*position: fixed;
     z-index: 10;*/
+  align-content: center;
+  justify-content: center;
 }
 
 .navbar-item {
   color: antiquewhite;
   background-color: rgb(59, 30, 30);
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
-  font-size: 45px;
+  font-size: 35px;
   list-style: none;
   margin: 0;
   border-left: 4px solid rgb(178, 175, 175);
   border-right: 4px solid rgb(178, 175, 175);
-  padding: 10px 20px 0 20px;
+  padding: 5px 20px 0 20px;
   font-weight: 600;
+}
+
+.navbar-item a,
+.title-item a {
+  color: rgb(224, 175, 111);
+  font-family: "Times New Roman", Times, serif;
+  text-decoration: none;
 }
 
 .navbar-item:hover {
@@ -41,13 +53,26 @@ body {
 
 .title-item {
   color: rgb(224, 175, 111);
-  font-family: "Times New Roman", Times, serif;
   font-weight: 800;
-  font-size: 65px;
+  font-size: 35px;
   list-style: none;
-  margin: 0 25px 0 26px;
+  margin: 5px 25px 0 26px;
+}
+
+.title-item:hover {
+  color: rgb(191, 154, 105);
+  cursor: pointer;
 }
 
 hr {
   color: rgb(178, 175, 175);
+}
+
+.main-header {
+  color: rgb(0, 0, 0);
+  font-family: "Times New Roman", Times, serif;
+  font-size: 50px;
+  text-align: right;
+  margin-right: 70px;
+  padding-top: 80px;
 }
