@@ -31,7 +31,7 @@ public class OfferService {
     public List<OfferModel> getAllOffers(String filter) throws ParseException {
         HashMap<String, String> map = new HashMap<>();
         String[] s = filter.split("\\?");
-        String filtration = s[0];
+        String[] filtration = s[0].split(",");
         for (int i = 1; i < s.length; i++) {
             String[] s_pars = s[i].split("=");
             map.put(s_pars[0], s_pars[1]);
@@ -81,10 +81,13 @@ public class OfferService {
                 .build());
     }
 
-    private List<Offers> doFilter(List<Offers> offers, String filter, HashMap<String, String> params) throws ParseException {
+    private List<Offers> doFilter(List<Offers> offers, String[] filter, HashMap<String, String> params) throws ParseException {
         FilterFactory filterFactory = new FilterFactory();
-        IFilter filterImpl = filterFactory.getFilter(filter);
-        return filterImpl.doFilter(params, offers);
+        for (String s : filter) {
+            IFilter filterImpl = filterFactory.getFilter(s);
+            offers = filterImpl.doFilter(params, offers);
+        }
+        return offers;
     }
 
     public void deleteOffer(Long id) {
