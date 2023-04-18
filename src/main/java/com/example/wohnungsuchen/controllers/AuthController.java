@@ -3,6 +3,7 @@ package com.example.wohnungsuchen.controllers;
 import com.example.wohnungsuchen.auth.JwtRequest;
 import com.example.wohnungsuchen.auth.JwtResponse;
 import com.example.wohnungsuchen.auth.RefreshJwtRequest;
+import com.example.wohnungsuchen.auxiliarymodels.EmailModel;
 import com.example.wohnungsuchen.postmodels.UserPostModel;
 import com.example.wohnungsuchen.services.AuthService;
 import jakarta.security.auth.message.AuthException;
@@ -46,7 +47,7 @@ public class AuthController {
     }
 
     @PostMapping("send")
-    public void sendActivationCode(){
-        authService.sendActivationCode();
+    public void sendActivationCode(@RequestBody EmailModel email){
+        authService.sendActivationCode(email);
     }
 }

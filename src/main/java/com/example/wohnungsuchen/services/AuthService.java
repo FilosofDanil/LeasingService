@@ -4,6 +4,7 @@ import com.example.wohnungsuchen.auth.JwtAuthentication;
 import com.example.wohnungsuchen.auth.JwtProvider;
 import com.example.wohnungsuchen.auth.JwtRequest;
 import com.example.wohnungsuchen.auth.JwtResponse;
+import com.example.wohnungsuchen.auxiliarymodels.EmailModel;
 import com.example.wohnungsuchen.entities.Credentials;
 import com.example.wohnungsuchen.postmodels.UserPostModel;
 import io.jsonwebtoken.Claims;
@@ -69,15 +70,20 @@ public class AuthService {
         throw new AuthException("Невалидный JWT токен");
     }
 
-    public void signup(UserPostModel userPostModel){
+    public void signup(UserPostModel userPostModel) {
         credentialsService.sign_up(userPostModel);
     }
 
-    public void activate(String code){
+    public void activate(String code) {
         credentialsService.activate(code);
     }
 
-    public void sendActivationCode(){
+    public void sendActivationCode(EmailModel email) {
+        if (credentialsService.getByLogin(email.getEmail()).isPresent()) {
+            credentialsService.sendActivationCode(email);
+        } else {
+            throw new NullPointerException();
+        }
 
     }
 

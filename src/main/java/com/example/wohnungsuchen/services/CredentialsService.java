@@ -1,9 +1,11 @@
 package com.example.wohnungsuchen.services;
 
 import com.example.wohnungsuchen.auth.Role;
+import com.example.wohnungsuchen.auxiliarymodels.EmailModel;
 import com.example.wohnungsuchen.entities.Credentials;
 import com.example.wohnungsuchen.entities.Leaseholders;
 import com.example.wohnungsuchen.entities.Searchers;
+import com.example.wohnungsuchen.models.ProfileModel;
 import com.example.wohnungsuchen.postmodels.UserPostModel;
 import com.example.wohnungsuchen.repositories.CredentialsRepository;
 import com.example.wohnungsuchen.repositories.LeaseholdersRepository;
@@ -69,8 +71,16 @@ public class CredentialsService {
         sendActivationCodeAssistant(credentials);
     }
 
-    public void sendActivationCode() {
-
+    public void sendActivationCode(EmailModel email) {
+        Credentials credentials = credentialsRepository.findByEmail(email.getEmail());
+        if (credentials.getVerified()) {
+            throw new RuntimeException();
+        }
+//        if(credentials.getActivationCode()==null){
+//            credentials.setActivationCode(UUID.randomUUID().toString());
+//            credentialsRepository.save(credentials);
+//        }
+        sendActivationCodeAssistant(credentials);
     }
 
     private void sendActivationCodeAssistant(Credentials credentials) {
@@ -104,7 +114,7 @@ public class CredentialsService {
         return credentials;
     }
 
-    public void deleteCredentials(Long id){
+    public void deleteCredentials(Long id) {
         Credentials credentials = credentialsRepository.findById(id).get();
         leaseholdersRepository.findAll().forEach(leaseholders -> {
             if (leaseholders.getCredentials().equals(credentials)) {
@@ -117,6 +127,14 @@ public class CredentialsService {
             }
         });
         credentialsRepository.deleteById(id);
+    }
+
+    public ProfileModel getProfileById(Long id) {
+        List<Credentials> credentialsList = getAllCredits();
+        if (credentialsList.stream().findAny().isEmpty()) {
+            throw new NullPointerException();
+        }
+        return UserMapper.toProfileModel(credentialsList.stream().findFirst().get());
     }
 
     static class UserMapper {
@@ -139,6 +157,18 @@ public class CredentialsService {
                     .password(user.getPassword())
                     .birthDate(user.getBirthDate())
                     .verified(false)
+                    .build();
+        }
+
+        private static ProfileModel toProfileModel(Credentials credentials) {
+            return ProfileModel.builder()
+                    .id(credentials.getId())
+                    .name(credentials.getProfile_name())
+                    .surname(credentials.getSurname())
+                    .phone(credentials.getPhone())
+                    .email(credentials.getEmail())
+                    .verified(credentials.getVerified())
+                    .date_of_birth(credentials.getBirthDate())
                     .build();
         }
     }

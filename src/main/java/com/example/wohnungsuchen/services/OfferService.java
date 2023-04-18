@@ -2,6 +2,8 @@ package com.example.wohnungsuchen.services;
 
 import com.example.wohnungsuchen.entities.Offers;
 import com.example.wohnungsuchen.entities.Posted;
+import com.example.wohnungsuchen.filters.FilterFactory;
+import com.example.wohnungsuchen.filters.IFilter;
 import com.example.wohnungsuchen.models.OfferModel;
 import com.example.wohnungsuchen.postmodels.OfferPostModel;
 import com.example.wohnungsuchen.repositories.ImagesRepository;
@@ -9,8 +11,12 @@ import com.example.wohnungsuchen.repositories.LeaseholdersRepository;
 import com.example.wohnungsuchen.repositories.OffersRepository;
 import com.example.wohnungsuchen.repositories.PostedRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -22,11 +28,33 @@ public class OfferService {
     private final ImagesRepository imagesRepository;
     private final LeaseholdersRepository leaseholdersRepository;
 
+    public List<OfferModel> getAllOffers(String filter) throws ParseException {
+        HashMap<String, String> map = new HashMap<>();
+        String[] s = filter.split("\\?");
+        String filtration = s[0];
+        for (int i = 1; i < s.length; i++) {
+            String[] s_pars = s[i].split("=");
+            map.put(s_pars[0], s_pars[1]);
+        }
+        List<Offers> list = doFilter(getOffersList(), filtration, map);
+        return list.stream()
+                .map(OfferMapper::toModel)
+                .collect(Collectors.toList());
+    }
+
     public List<OfferModel> getAllOffers() {
-        return getOffersList()
+        List<Offers> list = getOffersList();
+        return list.stream()
+                .map(OfferMapper::toModel)
+                .collect(Collectors.toList());
+    }
+
+    public Page<OfferModel> getAllOffers(Pageable pageable) {
+        List<OfferModel> list = getOffersList()
                 .stream()
                 .map(OfferMapper::toModel)
                 .collect(Collectors.toList());
+        return new PageImpl<>(list, pageable, 0);
     }
 
     public List<OfferModel> getOfferByCity(String city) {
@@ -51,6 +79,12 @@ public class OfferService {
                 .leaseholder(leaseholdersRepository.findById(offerPostModel.getLeaseholder_id()).get())
                 .offer(offer)
                 .build());
+    }
+
+    private List<Offers> doFilter(List<Offers> offers, String filter, HashMap<String, String> params) throws ParseException {
+        FilterFactory filterFactory = new FilterFactory();
+        IFilter filterImpl = filterFactory.getFilter(filter);
+        return filterImpl.doFilter(params, offers);
     }
 
     public void deleteOffer(Long id) {
@@ -81,34 +115,34 @@ public class OfferService {
 
     public void partlyUpdateOffer(Long id, OfferPostModel offer) {
         offersRepository.findById(id).map(offers -> {
-            if(offer.getCity()!=null){
+            if (offer.getCity() != null) {
                 offers.setCity(offer.getCity());
             }
-            if(offer.getArea()!=null){
+            if (offer.getArea() != null) {
                 offers.setArea(offer.getArea());
             }
-            if(offer.getBalkoon()!=null){
+            if (offer.getBalkoon() != null) {
                 offers.setBalkoon(offer.getBalkoon());
             }
-            if(offer.getColdArend()!=null){
+            if (offer.getColdArend() != null) {
                 offers.setColdArend(offer.getColdArend());
             }
-            if(offer.getAddress()!=null){
+            if (offer.getAddress() != null) {
                 offers.setAddress(offer.getAddress());
             }
-            if(offer.getRooms()!=null){
+            if (offer.getRooms() != null) {
                 offers.setRooms(offer.getRooms());
             }
-            if(offer.getFloor()!=null){
+            if (offer.getFloor() != null) {
                 offers.setFloor(offer.getFloor());
             }
-            if(offer.getDescription()!=null){
+            if (offer.getDescription() != null) {
                 offers.setDescription(offer.getDescription());
             }
-            if(offer.getInternet()!=null){
+            if (offer.getInternet() != null) {
                 offers.setInternet(offer.getInternet());
             }
-            if(offer.getTitle()!=null){
+            if (offer.getTitle() != null) {
                 offers.setTitle(offer.getTitle());
             }
             return offersRepository.save(offers);

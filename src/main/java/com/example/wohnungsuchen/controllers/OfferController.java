@@ -5,14 +5,19 @@ import com.example.wohnungsuchen.models.OfferModel;
 import com.example.wohnungsuchen.postmodels.OfferPostModel;
 import com.example.wohnungsuchen.services.AuthService;
 import com.example.wohnungsuchen.services.OfferService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/v1/offers")
+@RequestMapping("/offers")
 public class OfferController {
     private final OfferService offerService;
     private final AuthService authService;
@@ -22,10 +27,19 @@ public class OfferController {
         this.authService = authService;
     }
 
-    @GetMapping("/")
-    public List<OfferModel> getAllOffers() {
+    @GetMapping("/v1")
+    public List<OfferModel> getAllOffers(@RequestParam(required = false) String filter) throws ParseException {
         final JwtAuthentication authInfo = authService.getAuthInfo();
-        return ResponseEntity.ok(offerService.getAllOffers()).getBody();
+        if(filter==null){
+            return ResponseEntity.ok(offerService.getAllOffers()).getBody();
+        }
+        return ResponseEntity.ok(offerService.getAllOffers(filter)).getBody();
+    }
+
+    @GetMapping("/v2")
+    public Page<OfferModel> getAllOffers(@PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) {
+        final JwtAuthentication authInfo = authService.getAuthInfo();
+        return ResponseEntity.ok(offerService.getAllOffers(pageable)).getBody();
     }
 
     @PreAuthorize("hasAuthority('LEASEHOLDER')")
