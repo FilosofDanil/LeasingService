@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.*;
 public class CredentialsController {
     private final CredentialsService credentialsService;
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/v1/{id}")
     public void deleteCredentials(@PathVariable Long id) {
         credentialsService.deleteCredentials(id);
     }
 
-    @GetMapping("/v1/profiles/{id}")
+    @GetMapping("/v1/{id}")
     public ProfileModel getProfile(@PathVariable Long id) {
         return credentialsService.getProfileById(id);
     }

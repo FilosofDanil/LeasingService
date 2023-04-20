@@ -4,6 +4,7 @@ import com.example.wohnungsuchen.entities.Offers;
 import com.example.wohnungsuchen.entities.Posted;
 import com.example.wohnungsuchen.filters.FilterFactory;
 import com.example.wohnungsuchen.filters.IFilter;
+import com.example.wohnungsuchen.models.CreatedOfferModel;
 import com.example.wohnungsuchen.models.OfferModel;
 import com.example.wohnungsuchen.postmodels.OfferPostModel;
 import com.example.wohnungsuchen.repositories.ImagesRepository;
@@ -17,7 +18,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,14 +33,7 @@ public class OfferService {
     private final LeaseholdersRepository leaseholdersRepository;
 
     public List<OfferModel> getAllOffers(String filter) throws ParseException {
-        HashMap<String, String> map = new HashMap<>();
-        String[] s = filter.split("\\?");
-        String[] filtration = s[0].split(",");
-        for (int i = 1; i < s.length; i++) {
-            String[] s_pars = s[i].split("=");
-            map.put(s_pars[0], s_pars[1]);
-        }
-        List<Offers> list = doFilter(getOffersList(), filtration, map);
+        List<Offers> list = doFilter(getOffersList(), detectFiltrationMethods(divideString(filter)), getParametersMap(divideString(filter)));
         return list.stream()
                 .map(OfferMapper::toModel)
                 .collect(Collectors.toList());
@@ -49,12 +46,24 @@ public class OfferService {
                 .collect(Collectors.toList());
     }
 
-    public Page<OfferModel> getAllOffers(Pageable pageable) {
-        List<OfferModel> list = getOffersList()
-                .stream()
+    public Page<OfferModel> getAllOffersPage(Pageable pageable) {
+        return offersRepository.findAll(pageable).map(OfferMapper::toModel);
+    }
+
+    public List<CreatedOfferModel> getAllCreatedOffersByLeaseholderId(Long leaseholder_id) {
+        List<CreatedOfferModel> list = new ArrayList<>();
+        postedRepository.findAllByLeaseholderId(leaseholder_id).forEach(posted -> {
+            list.add(OfferMapper.toCreatedOfferModel(posted.getOffer()));
+        });
+        return list;
+    }
+
+    public Page<OfferModel> getAllOffers(Pageable pageable, String filter) throws ParseException {
+        List<Offers> list = doFilter(getOffersList(), detectFiltrationMethods(divideString(filter)), getParametersMap(divideString(filter)));
+        List<OfferModel> offerModelList = list.stream()
                 .map(OfferMapper::toModel)
                 .collect(Collectors.toList());
-        return new PageImpl<>(list, pageable, 0);
+        return new PageImpl<>(offerModelList, pageable, offerModelList.size());
     }
 
     public List<OfferModel> getOfferByCity(String city) {
@@ -88,6 +97,23 @@ public class OfferService {
             offers = filterImpl.doFilter(params, offers);
         }
         return offers;
+    }
+
+    private HashMap<String, String> getParametersMap(String[] s) {
+        HashMap<String, String> map = new HashMap<>();
+        for (int i = 1; i < s.length; i++) {
+            String[] s_pars = s[i].split("=");
+            map.put(s_pars[0], s_pars[1]);
+        }
+        return map;
+    }
+
+    private String[] divideString(String filter) {
+        return filter.split("\\?");
+    }
+
+    private String[] detectFiltrationMethods(String[] s) {
+        return s[0].split(",");
     }
 
     public void deleteOffer(Long id) {
@@ -159,6 +185,26 @@ public class OfferService {
     }
 
     static class OfferMapper {
+        private static CreatedOfferModel toCreatedOfferModel(Offers offer) {
+            return CreatedOfferModel.builder()
+                    .id(offer.getId())
+                    .address(offer.getAddress())
+                    .area(offer.getArea())
+                    .balkoon(offer.getBalkoon())
+                    .link(offer.getImage().getLink())
+                    .city(offer.getCity())
+                    .coldArend(offer.getColdArend())
+                    .warmArend(offer.getWarmArend())
+                    .postdate(offer.getPost_date())
+                    .rooms(offer.getRooms())
+                    .floor(offer.getFloor())
+                    .description(offer.getDescription())
+                    .internet(offer.getInternet())
+                    .title(offer.getTitle())
+                    .likes_link("http://localhost:8080/api/likes/v1/" + offer.getId())
+                    .build();
+        }
+
         private static OfferModel toModel(Offers offer) {
             return OfferModel.builder()
                     .id(offer.getId())

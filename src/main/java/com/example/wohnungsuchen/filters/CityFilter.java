@@ -1,7 +1,6 @@
 package com.example.wohnungsuchen.filters;
 
 import com.example.wohnungsuchen.entities.Offers;
-import com.example.wohnungsuchen.repositories.OffersRepository;
 import lombok.Getter;
 import lombok.Setter;
 

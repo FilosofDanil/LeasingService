@@ -1,23 +1,29 @@
 package com.example.wohnungsuchen.controllers;
 
 import com.example.wohnungsuchen.models.LikeModel;
+import com.example.wohnungsuchen.postmodels.LikePostModel;
 import com.example.wohnungsuchen.services.LikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.*;
 
 @RestController
-@RequestMapping("/api/like")
+@RequestMapping("/api/likes")
 @RequiredArgsConstructor
 public class LikeConroller {
     private final LikeService likedService;
 
     @PreAuthorize("hasAuthority('SEARCHER')")
     @PostMapping("/")
-    public void like(@RequestBody LikeModel likeModel) {
-        likedService.like(likeModel);
+    public void like(@RequestBody LikePostModel likePostModel) {
+        likedService.like(likePostModel);
+    }
+
+    @PreAuthorize("hasAuthority('LEASEHOLDER')")
+    @GetMapping("/v1/{offer_id}")
+    public List<LikeModel> getAllLikesByOffer(@PathVariable Long offer_id) {
+        return likedService.getAllLikesByOffer(offer_id);
     }
 }

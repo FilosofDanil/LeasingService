@@ -1,6 +1,7 @@
 package com.example.wohnungsuchen.controllers;
 
 import com.example.wohnungsuchen.auth.JwtAuthentication;
+import com.example.wohnungsuchen.models.CreatedOfferModel;
 import com.example.wohnungsuchen.models.OfferModel;
 import com.example.wohnungsuchen.postmodels.OfferPostModel;
 import com.example.wohnungsuchen.services.AuthService;
@@ -30,16 +31,28 @@ public class OfferController {
     @GetMapping("/v1")
     public List<OfferModel> getAllOffers(@RequestParam(required = false) String filter) throws ParseException {
         final JwtAuthentication authInfo = authService.getAuthInfo();
-        if(filter==null){
+        if (filter == null) {
             return ResponseEntity.ok(offerService.getAllOffers()).getBody();
         }
         return ResponseEntity.ok(offerService.getAllOffers(filter)).getBody();
     }
 
     @GetMapping("/v2")
-    public Page<OfferModel> getAllOffers(@PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) {
+    public Page<OfferModel> getAllOffers(@RequestParam(required = false) String filter, @PageableDefault(sort = {"id"}, direction = Sort.Direction.ASC, size = 5) Pageable pageable) throws ParseException {
         final JwtAuthentication authInfo = authService.getAuthInfo();
-        return ResponseEntity.ok(offerService.getAllOffers(pageable)).getBody();
+        return ResponseEntity.ok(offerService.getAllOffers(pageable, filter)).getBody();
+    }
+
+    @GetMapping("/v3")
+    public Page<OfferModel> getAllOffers(@PageableDefault(size = 5, sort = {"id"}, direction = Sort.Direction.ASC) Pageable pageable) throws ParseException {
+        final JwtAuthentication authInfo = authService.getAuthInfo();
+        return ResponseEntity.ok(offerService.getAllOffersPage(pageable)).getBody();
+    }
+
+    @PreAuthorize("hasAuthority('LEASEHOLDER')")
+    @GetMapping("/v1/{leaseholder_id}")
+    public List<CreatedOfferModel> getAllCreatedOffersByLeaseholder(@PathVariable Long leaseholder_id) {
+        return offerService.getAllCreatedOffersByLeaseholderId(leaseholder_id);
     }
 
     @PreAuthorize("hasAuthority('LEASEHOLDER')")

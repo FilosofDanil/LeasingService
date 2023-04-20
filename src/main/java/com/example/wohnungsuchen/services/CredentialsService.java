@@ -49,7 +49,6 @@ public class CredentialsService {
         if (getByLogin(user.getEmail()).isPresent()) {
             throw new RuntimeException();
         }
-
         Credentials credentials = UserMapper.toCredits(user);
         credentials.setActivationCode(UUID.randomUUID().toString());
         credentials.setVerified(false);
@@ -76,10 +75,11 @@ public class CredentialsService {
         if (credentials.getVerified()) {
             throw new RuntimeException();
         }
-//        if(credentials.getActivationCode()==null){
-//            credentials.setActivationCode(UUID.randomUUID().toString());
-//            credentialsRepository.save(credentials);
-//        }
+        if (credentials.getActivationCode() == null) {
+            credentials.setActivationCode(UUID.randomUUID().toString());
+            setRoleToUser(credentials);
+            credentialsRepository.save(credentials);
+        }
         sendActivationCodeAssistant(credentials);
     }
 
@@ -102,13 +102,13 @@ public class CredentialsService {
 
     private Credentials setRoleToUser(Credentials credentials) {
         leaseholdersRepository.findAll().forEach(leaseholders -> {
-            if (leaseholders.getCredentials().equals(credentials)) {
-                credentials.setRoles(Collections.singleton(Role.LEASEHOLDER));
+            if (leaseholders.getCredentials().getId().equals(credentials.getId())) {
+                credentials.setRoles(new HashSet<>(Set.of(Role.LEASEHOLDER)));
             }
         });
         searchersRepository.findAll().forEach(searchers -> {
-            if (searchers.getCredentials().equals(credentials)) {
-                credentials.setRoles(Collections.singleton(Role.SEARCHER));
+            if (searchers.getCredentials().getId().equals(credentials.getId())) {
+                credentials.setRoles(new HashSet<>(Set.of(Role.SEARCHER)));
             }
         });
         return credentials;

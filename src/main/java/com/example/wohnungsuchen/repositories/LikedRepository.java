@@ -3,5 +3,8 @@ package com.example.wohnungsuchen.repositories;
 import com.example.wohnungsuchen.entities.Liked;
 import org.springframework.data.repository.CrudRepository;
 
-public interface LikedRepository extends CrudRepository<Liked,Long> {
+import java.util.*;
+
+public interface LikedRepository extends CrudRepository<Liked, Long> {
+    List<Liked> findAllByOfferId(Long id);
 }
