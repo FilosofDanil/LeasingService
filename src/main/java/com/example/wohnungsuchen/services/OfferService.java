@@ -66,14 +66,6 @@ public class OfferService {
         return new PageImpl<>(offerModelList, pageable, offerModelList.size());
     }
 
-    public List<OfferModel> getOfferByCity(String city) {
-        return getOffersList()
-                .stream()
-                .filter(offer -> offer.getCity().equals(city))
-                .map(OfferMapper::toModel)
-                .collect(Collectors.toList());
-    }
-
     public void addOffer(OfferPostModel offerPostModel) {
         Offers offer = OfferMapper.toOffer(offerPostModel);
         imagesRepository.findAll().forEach(images -> {

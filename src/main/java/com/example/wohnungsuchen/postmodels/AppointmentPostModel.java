@@ -27,6 +27,4 @@ public class AppointmentPostModel {
     private Leaseholders leaseholder;
     @JsonProperty("offer")
     private Offers offer;
-    @JsonProperty("searcher")
-    private Searchers searcher;
 }

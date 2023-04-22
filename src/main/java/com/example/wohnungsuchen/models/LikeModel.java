@@ -11,12 +11,20 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class LikeModel {
+    @JsonProperty("offer_title")
+    private String offerTitle;
+    @JsonProperty("offer_image_path")
+    private String imagePath;
+    @JsonProperty("offer_city")
+    private String offerCity;
+    @JsonProperty("offer_address")
+    private String offerAddress;
     @JsonProperty("username")
     private String username;
     @JsonProperty("surname")
     private String surname;
     @JsonProperty("profile_link")
     private String profileLink;
-//    @JsonProperty("appointment_link")
-//    private String appointmentLink;
+    @JsonProperty("appointment_link")
+    private String appointmentLink;
 }

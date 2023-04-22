@@ -40,9 +40,14 @@ public class LikeService {
     static class LikedMapper {
         private static LikeModel toModel(Liked liked) {
             return LikeModel.builder()
+                    .offerAddress(liked.getOffer().getAddress())
+                    .imagePath(liked.getOffer().getImage().getLink())
+                    .offerCity(liked.getOffer().getCity())
+                    .offerTitle(liked.getOffer().getTitle())
                     .username(liked.getSearcher().getCredentials().getProfile_name())
                     .surname(liked.getSearcher().getCredentials().getSurname())
                     .profileLink("http://localhost:8080/api/profile/v1/" + liked.getSearcher().getCredentials().getId())
+                    .appointmentLink("http://localhost:8080/api/v1/appointments/" + liked.getSearcher().getId())
                     .build();
         }
     }

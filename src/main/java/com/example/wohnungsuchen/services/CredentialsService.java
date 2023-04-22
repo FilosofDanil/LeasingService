@@ -15,6 +15,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.*;
 
@@ -84,7 +85,8 @@ public class CredentialsService {
     }
 
     private void sendActivationCodeAssistant(Credentials credentials) {
-        mailSender.send(credentials.getEmail(), "Profile Verification", "Hi! We're glad to see, that you have chosen our service. \n" +
+        mailSender.send(credentials.getEmail(), "Profile Verification", "Dear "+credentials.getProfile_name() +" "+credentials.getSurname() +"\n" +
+                "We're glad to see, that you have chosen our service. \n" +
                 "For a further partnership with you, it's required to verify your email \n" +
                 "To activate your account, you just need to click the link below \n"
                 + "http://localhost:8080/api/auth/activate/" + credentials.getActivationCode());

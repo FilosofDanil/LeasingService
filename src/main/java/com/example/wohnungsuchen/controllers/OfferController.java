@@ -61,11 +61,6 @@ public class OfferController {
         return null;
     }
 
-    @GetMapping("/city={city_name}")
-    public List<OfferModel> getOffersByCity(@PathVariable String city_name) {
-        return offerService.getOfferByCity(city_name);
-    }
-
     @PreAuthorize("hasAuthority('LEASEHOLDER')")
     @PostMapping("/")
     public void addOffer(@RequestBody OfferPostModel offerPostModel) {
