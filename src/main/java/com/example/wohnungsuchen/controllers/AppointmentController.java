@@ -41,7 +41,7 @@ public class AppointmentController {
 
     @PreAuthorize("hasAuthority('LEASEHOLDER')")
     @PostMapping("/")
-    public void addAppointment(AppointmentPostModel appointmentPostModel){
+    public void addAppointment(@RequestBody AppointmentPostModel appointmentPostModel){
         appointmentService.addAppointment(appointmentPostModel);
     }
 

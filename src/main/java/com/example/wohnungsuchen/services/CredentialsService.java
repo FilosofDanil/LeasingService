@@ -85,7 +85,7 @@ public class CredentialsService {
     }
 
     private void sendActivationCodeAssistant(Credentials credentials) {
-        mailSender.send(credentials.getEmail(), "Profile Verification", "Dear "+credentials.getProfile_name() +" "+credentials.getSurname() +"\n" +
+        mailSender.send(credentials.getEmail(), "Profile Verification", "Dear " + credentials.getProfile_name() + " " + credentials.getSurname() + "\n" +
                 "We're glad to see, that you have chosen our service. \n" +
                 "For a further partnership with you, it's required to verify your email \n" +
                 "To activate your account, you just need to click the link below \n"
@@ -138,6 +138,8 @@ public class CredentialsService {
         }
         return UserMapper.toProfileModel(credentialsList.stream().findFirst().get());
     }
+
+
 
     static class UserMapper {
 //        private static User format(Credentials credentials){

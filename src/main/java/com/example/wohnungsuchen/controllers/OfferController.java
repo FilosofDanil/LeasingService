@@ -6,6 +6,7 @@ import com.example.wohnungsuchen.models.OfferModel;
 import com.example.wohnungsuchen.postmodels.OfferPostModel;
 import com.example.wohnungsuchen.services.AuthService;
 import com.example.wohnungsuchen.services.OfferService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -19,14 +20,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/offers")
+@RequiredArgsConstructor
 public class OfferController {
     private final OfferService offerService;
     private final AuthService authService;
-
-    public OfferController(OfferService offerService, AuthService authService) {
-        this.offerService = offerService;
-        this.authService = authService;
-    }
 
     @GetMapping("/v1")
     public List<OfferModel> getAllOffers(@RequestParam(required = false) String filter) throws ParseException {

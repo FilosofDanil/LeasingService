@@ -7,13 +7,15 @@ import com.example.wohnungsuchen.entities.Searchers;
 import com.example.wohnungsuchen.models.AppointmentModel;
 import com.example.wohnungsuchen.postmodels.AppointmentPostModel;
 import com.example.wohnungsuchen.repositories.AppointmentsRepository;
-import com.example.wohnungsuchen.repositories.CredentialsRepository;
+import com.example.wohnungsuchen.repositories.LeaseholdersRepository;
+import com.example.wohnungsuchen.repositories.OffersRepository;
 import com.example.wohnungsuchen.repositories.SearchersRepository;
 import com.example.wohnungsuchen.security.MailSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,8 +24,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AppointmentService {
     private final AppointmentsRepository appointmentsRepository;
-    private final CredentialsRepository credentialsRepository;
     private final SearchersRepository searchersRepository;
+    private final OffersRepository offersRepository;
+    private final LeaseholdersRepository leaseholdersRepository;
     @Autowired
     private MailSender mailSender;
 
@@ -48,7 +51,7 @@ public class AppointmentService {
     }
 
     public void addAppointment(AppointmentPostModel appointmentPostModel) {
-        appointmentsRepository.save(AppointmentMapper.toEntity(appointmentPostModel));
+        appointmentsRepository.save(AppointmentMapper.toEntity(appointmentPostModel, offersRepository, leaseholdersRepository));
     }
 
     public void assignAppointmentToCertainUser(Long searchers_id, Long appointment_id) {
@@ -62,6 +65,10 @@ public class AppointmentService {
         sendMessage(searcher.getCredentials(), appointment);
     }
 
+    public void deleteAppointment(Long id) {
+        appointmentsRepository.deleteById(id);
+    }
+
     private void sendMessage(Credentials credentials, Appointments appointments) {
         mailSender.send(credentials.getEmail(), "Making an appointment", "Dear " + credentials.getProfile_name() + " " + credentials.getSurname() + "\n" +
                 "Address: " + appointments.getOffer().getCity() + " " + appointments.getOffer().getAddress() + "\nHi! Congratulations, you have been invited by "
@@ -71,10 +78,6 @@ public class AppointmentService {
                 "If you wouldn't to get remind notifications, you have an opportunity to disable this function in your profile settings \n" +
                 "Respectfully, WohnungSuchen!"
         );
-    }
-
-    public void deleteAppointment(Long id) {
-        appointmentsRepository.deleteById(id);
     }
 
     public void deleteAppointmentsByOfferAndTime(AppointmentDeleteModel appointmentDeleteModel) {
@@ -94,14 +97,14 @@ public class AppointmentService {
         appointmentsRepository.findById(id)
                 .map(appointments -> {
                     appointments.setDescription(appointmentPostModel.getDescription());
-                    appointments.setMeeting_time(appointmentPostModel.getMeeting_time());
+                    appointments.setMeeting_time(Time.valueOf(appointmentPostModel.getMeeting_time()));
                     appointments.setMeeting_date(appointmentPostModel.getMeeting_date());
-                    appointments.setOffer(appointmentPostModel.getOffer());
-                    appointments.setLeaseholder(appointmentPostModel.getLeaseholder());
+                    appointments.setOffer(offersRepository.findById(appointmentPostModel.getOffer()).get());
+                    appointments.setLeaseholder(leaseholdersRepository.findById(appointmentPostModel.getLeaseholder()).get());
                     return appointmentsRepository.save(appointments);
                 })
                 .orElseGet(() -> {
-                    Appointments appointment = AppointmentMapper.toEntity(appointmentPostModel);
+                    Appointments appointment = AppointmentMapper.toEntity(appointmentPostModel, offersRepository, leaseholdersRepository);
                     return appointmentsRepository.save(appointment);
                 });
     }
@@ -131,13 +134,13 @@ public class AppointmentService {
                     .build();
         }
 
-        private static Appointments toEntity(AppointmentPostModel appointmentPostModel) {
+        private static Appointments toEntity(AppointmentPostModel appointmentPostModel, OffersRepository offersRepository, LeaseholdersRepository leaseholdersRepository) {
             return Appointments.builder()
                     .description(appointmentPostModel.getDescription())
-                    .meeting_time(appointmentPostModel.getMeeting_time())
+                    .meeting_time(Time.valueOf(appointmentPostModel.getMeeting_time()))
                     .meeting_date(appointmentPostModel.getMeeting_date())
-                    .offer(appointmentPostModel.getOffer())
-                    .leaseholder(appointmentPostModel.getLeaseholder())
+                    .offer(offersRepository.findById(appointmentPostModel.getOffer()).get())
+                    .leaseholder(leaseholdersRepository.findById(appointmentPostModel.getLeaseholder()).get())
                     .build();
         }
     }

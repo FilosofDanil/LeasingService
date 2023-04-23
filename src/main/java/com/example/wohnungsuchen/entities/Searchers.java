@@ -23,6 +23,10 @@ public class Searchers {
 
     @Column(name = "city")
     private String city;
+
+    @Column(name = "notifications", nullable = false)
+    private Boolean notifications;
+
     public Searchers() {
     }
 }
