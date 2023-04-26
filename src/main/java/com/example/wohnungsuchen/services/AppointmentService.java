@@ -3,16 +3,15 @@ package com.example.wohnungsuchen.services;
 import com.example.wohnungsuchen.auxiliarymodels.AppointmentDeleteModel;
 import com.example.wohnungsuchen.entities.Appointments;
 import com.example.wohnungsuchen.entities.Credentials;
+import com.example.wohnungsuchen.entities.Leaseholders;
 import com.example.wohnungsuchen.entities.Searchers;
 import com.example.wohnungsuchen.models.AppointmentModel;
 import com.example.wohnungsuchen.postmodels.AppointmentPostModel;
-import com.example.wohnungsuchen.repositories.AppointmentsRepository;
-import com.example.wohnungsuchen.repositories.LeaseholdersRepository;
-import com.example.wohnungsuchen.repositories.OffersRepository;
-import com.example.wohnungsuchen.repositories.SearchersRepository;
+import com.example.wohnungsuchen.repositories.*;
 import com.example.wohnungsuchen.security.MailSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.sql.Time;
@@ -27,6 +26,7 @@ public class AppointmentService {
     private final SearchersRepository searchersRepository;
     private final OffersRepository offersRepository;
     private final LeaseholdersRepository leaseholdersRepository;
+    private final CredentialsRepository credentialsRepository;
     @Autowired
     private MailSender mailSender;
 
@@ -50,8 +50,11 @@ public class AppointmentService {
                 .collect(Collectors.toList());
     }
 
-    public void addAppointment(AppointmentPostModel appointmentPostModel) {
-        appointmentsRepository.save(AppointmentMapper.toEntity(appointmentPostModel, offersRepository, leaseholdersRepository));
+    public Appointments addAppointment(AppointmentPostModel appointmentPostModel, Authentication auth) {
+        Appointments appointments = AppointmentMapper.toEntity(appointmentPostModel, offersRepository, leaseholdersRepository);
+        appointments.setLeaseholder(getLeaseholderByName(auth));
+        appointmentsRepository.save(appointments);
+        return appointments;
     }
 
     public void assignAppointmentToCertainUser(Long searchers_id, Long appointment_id) {
@@ -93,20 +96,28 @@ public class AppointmentService {
                 .collect(Collectors.toList()));
     }
 
-    public void updateAppointment(AppointmentPostModel appointmentPostModel, Long id) {
+    public void updateAppointment(AppointmentPostModel appointmentPostModel, Long id, Authentication auth) {
         appointmentsRepository.findById(id)
                 .map(appointments -> {
+                    appointments.setLeaseholder(getLeaseholderByName(auth));
                     appointments.setDescription(appointmentPostModel.getDescription());
                     appointments.setMeeting_time(Time.valueOf(appointmentPostModel.getMeeting_time()));
                     appointments.setMeeting_date(appointmentPostModel.getMeeting_date());
                     appointments.setOffer(offersRepository.findById(appointmentPostModel.getOffer()).get());
-                    appointments.setLeaseholder(leaseholdersRepository.findById(appointmentPostModel.getLeaseholder()).get());
                     return appointmentsRepository.save(appointments);
                 })
                 .orElseGet(() -> {
                     Appointments appointment = AppointmentMapper.toEntity(appointmentPostModel, offersRepository, leaseholdersRepository);
                     return appointmentsRepository.save(appointment);
                 });
+    }
+
+    private Leaseholders getLeaseholderByName(Authentication auth) {
+        String name = auth.getName();
+        List<Credentials> credentials = new ArrayList<>();
+        credentialsRepository.findAll().forEach(credentials::add);
+        Credentials cred = credentials.stream().filter(credentials1 -> credentials1.getProfile_name().equals(name)).findFirst().get();
+        return leaseholdersRepository.findByCredentials(cred);
     }
 
     public void partlyUpdateAppointment() {
@@ -140,7 +151,6 @@ public class AppointmentService {
                     .meeting_time(Time.valueOf(appointmentPostModel.getMeeting_time()))
                     .meeting_date(appointmentPostModel.getMeeting_date())
                     .offer(offersRepository.findById(appointmentPostModel.getOffer()).get())
-                    .leaseholder(leaseholdersRepository.findById(appointmentPostModel.getLeaseholder()).get())
                     .build();
         }
     }

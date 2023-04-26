@@ -19,8 +19,6 @@ public class AppointmentPostModel {
     private String meeting_time;
     @JsonProperty("description")
     private String description;
-    @JsonProperty("lodger")
-    private Long leaseholder;
     @JsonProperty("offer")
     private Long offer;
 }

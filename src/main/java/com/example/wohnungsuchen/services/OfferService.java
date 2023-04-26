@@ -1,20 +1,22 @@
 package com.example.wohnungsuchen.services;
 
+import com.example.wohnungsuchen.entities.Credentials;
+import com.example.wohnungsuchen.entities.Leaseholders;
 import com.example.wohnungsuchen.entities.Offers;
-import com.example.wohnungsuchen.entities.Posted;
 import com.example.wohnungsuchen.filters.FilterFactory;
 import com.example.wohnungsuchen.filters.IFilter;
 import com.example.wohnungsuchen.models.CreatedOfferModel;
 import com.example.wohnungsuchen.models.OfferModel;
 import com.example.wohnungsuchen.postmodels.OfferPostModel;
+import com.example.wohnungsuchen.repositories.CredentialsRepository;
 import com.example.wohnungsuchen.repositories.ImagesRepository;
 import com.example.wohnungsuchen.repositories.LeaseholdersRepository;
 import com.example.wohnungsuchen.repositories.OffersRepository;
-import com.example.wohnungsuchen.repositories.PostedRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
@@ -28,7 +30,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class OfferService {
     private final OffersRepository offersRepository;
-    private final PostedRepository postedRepository;
+    private final CredentialsRepository credentialsRepository;
     private final ImagesRepository imagesRepository;
     private final LeaseholdersRepository leaseholdersRepository;
 
@@ -51,11 +53,11 @@ public class OfferService {
     }
 
     public List<CreatedOfferModel> getAllCreatedOffersByLeaseholderId(Long leaseholder_id) {
-        List<CreatedOfferModel> list = new ArrayList<>();
-        postedRepository.findAllByLeaseholderId(leaseholder_id).forEach(posted -> {
-            list.add(OfferMapper.toCreatedOfferModel(posted.getOffer()));
-        });
-        return list;
+        return getOffersList()
+                .stream()
+                .filter(offers -> offers.getLeaseholders().getId().equals(leaseholder_id))
+                .map(OfferMapper::toCreatedOfferModel)
+                .collect(Collectors.toList());
     }
 
     public Page<OfferModel> getAllOffers(Pageable pageable, String filter) throws ParseException {
@@ -66,20 +68,18 @@ public class OfferService {
         return new PageImpl<>(offerModelList, pageable, offerModelList.size());
     }
 
-    public void addOffer(OfferPostModel offerPostModel) {
+    public Offers addOffer(OfferPostModel offerPostModel, Authentication auth) {
         Offers offer = OfferMapper.toOffer(offerPostModel);
         imagesRepository.findAll().forEach(images -> {
             if (offerPostModel.getLink().equals(images.getLink())) {
                 offer.setImage(images);
             }
         });
+        offer.setLeaseholders(getLeaseholderByName(auth));
         Date postDate = new Date();
         offer.setPost_date(postDate);
         offersRepository.save(offer);
-        postedRepository.save(Posted.builder()
-                .leaseholder(leaseholdersRepository.findById(offerPostModel.getLeaseholder_id()).get())
-                .offer(offer)
-                .build());
+        return offer;
     }
 
     private List<Offers> doFilter(List<Offers> offers, String[] filter, HashMap<String, String> params) throws ParseException {
@@ -112,7 +112,7 @@ public class OfferService {
         offersRepository.deleteById(id);
     }
 
-    public void updateOffer(Long id, OfferPostModel offer) {
+    public void updateOffer(Long id, OfferPostModel offer, Authentication auth) {
         offersRepository.findById(id).map(offers -> {
                     offers.setAddress(offer.getAddress());
                     offers.setArea(offer.getArea());
@@ -125,11 +125,16 @@ public class OfferService {
                     offers.setDescription(offer.getDescription());
                     offers.setInternet(offer.getInternet());
                     offers.setTitle(offer.getTitle());
+                    if (!getLeaseholderByName(auth).getId().equals(offers.getLeaseholders().getId())) {
+                        throw new RuntimeException();
+                    }
+                    offers.setLeaseholders(getLeaseholderByName(auth));
                     return offersRepository.save(offers);
                 })
                 .orElseGet(() -> {
                     Offers offers = OfferMapper.toOffer(offer);
                     offers.setId(id);
+                    offers.setLeaseholders(getLeaseholderByName(auth));
                     return offersRepository.save(offers);
                 });
     }
@@ -168,6 +173,14 @@ public class OfferService {
             }
             return offersRepository.save(offers);
         });
+    }
+
+    private Leaseholders getLeaseholderByName(Authentication auth) {
+        String name = auth.getName();
+        List<Credentials> credentials = new ArrayList<>();
+        credentialsRepository.findAll().forEach(credentials::add);
+        Credentials cred = credentials.stream().filter(credentials1 -> credentials1.getProfile_name().equals(name)).findFirst().get();
+        return leaseholdersRepository.findByCredentials(cred);
     }
 
     private List<Offers> getOffersList() {

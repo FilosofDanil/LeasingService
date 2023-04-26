@@ -18,15 +18,15 @@ public class Offers {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name="title", nullable=false)
+    @Column(name = "title", nullable = false)
     private String title;
-    @Column (name="post_date", nullable=false)
+    @Column(name = "post_date", nullable = false)
     private Date post_date;
-    @Column (name="cold_arend", nullable=false)
+    @Column(name = "cold_arend", nullable = false)
     private Double coldArend;
-    @Column (name="warm_arend", nullable=false)
+    @Column(name = "warm_arend", nullable = false)
     private Double warmArend;
-    @Column(name="description")
+    @Column(name = "description")
     private String description;
     @Column(name = "city", nullable = false)
     private String city;
@@ -34,17 +34,21 @@ public class Offers {
     private String address;
     @Column(name = "rooms", nullable = false)
     private Integer rooms;
-    @Column(name="area", nullable = false)
+    @Column(name = "area", nullable = false)
     private Double area;
-    @Column(name="internet")
+    @Column(name = "internet")
     private Boolean internet;
-    @Column(name="balkoon")
+    @Column(name = "balkoon")
     private Boolean balkoon;
     @Column(name = "floor", nullable = false)
     private Integer floor;
     @ManyToOne
     @JoinColumn(name = "image_id", referencedColumnName = "id", nullable = false)
     private Images image;
+    @ManyToOne
+    @JoinColumn(name = "leaseholder_id", referencedColumnName = "id", nullable = false)
+    private Leaseholders leaseholders;
+
     public Offers() {
     }
 }

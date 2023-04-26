@@ -1,6 +1,9 @@
 package com.example.wohnungsuchen.controllers;
 
 import com.example.wohnungsuchen.auth.JwtAuthentication;
+import com.example.wohnungsuchen.entities.Credentials;
+import com.example.wohnungsuchen.entities.Leaseholders;
+import com.example.wohnungsuchen.entities.Offers;
 import com.example.wohnungsuchen.models.CreatedOfferModel;
 import com.example.wohnungsuchen.models.OfferModel;
 import com.example.wohnungsuchen.postmodels.OfferPostModel;
@@ -11,8 +14,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
@@ -41,7 +48,7 @@ public class OfferController {
     }
 
     @GetMapping("/v3")
-    public Page<OfferModel> getAllOffers(@PageableDefault(size = 5, sort = {"id"}, direction = Sort.Direction.ASC) Pageable pageable) throws ParseException {
+    public Page<OfferModel> getAllOffers(@RequestParam(required = false) String sort, @RequestParam(required = false) String direction, @PageableDefault(size = 5, sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) throws ParseException {
         final JwtAuthentication authInfo = authService.getAuthInfo();
         return ResponseEntity.ok(offerService.getAllOffersPage(pageable)).getBody();
     }
@@ -49,7 +56,7 @@ public class OfferController {
     @PreAuthorize("hasAuthority('LEASEHOLDER')")
     @GetMapping("/v1/{leaseholder_id}")
     public List<CreatedOfferModel> getAllCreatedOffersByLeaseholder(@PathVariable Long leaseholder_id) {
-        return offerService.getAllCreatedOffersByLeaseholderId(leaseholder_id);
+        return ResponseEntity.ok(offerService.getAllCreatedOffersByLeaseholderId(leaseholder_id)).getBody();
     }
 
     @PreAuthorize("hasAuthority('LEASEHOLDER')")
@@ -60,8 +67,9 @@ public class OfferController {
 
     @PreAuthorize("hasAuthority('LEASEHOLDER')")
     @PostMapping("/")
-    public void addOffer(@RequestBody OfferPostModel offerPostModel) {
-        offerService.addOffer(offerPostModel);
+    public ResponseEntity<Offers> addOffer(@RequestBody OfferPostModel offerPostModel) {
+        Offers savedOffer = offerService.addOffer(offerPostModel, SecurityContextHolder.getContext().getAuthentication());
+        return new ResponseEntity<>(savedOffer, HttpStatus.CREATED);
     }
 
     @PreAuthorize("hasAuthority('LEASEHOLDER')")
@@ -73,7 +81,7 @@ public class OfferController {
     @PreAuthorize("hasAuthority('LEASEHOLDER')")
     @PutMapping("/{id}")
     public void updateOffer(@PathVariable Long id, @RequestBody OfferPostModel offerPostModel) {
-        offerService.updateOffer(id, offerPostModel);
+        offerService.updateOffer(id, offerPostModel, SecurityContextHolder.getContext().getAuthentication());
     }
 
     @PreAuthorize("hasAuthority('LEASEHOLDER')")

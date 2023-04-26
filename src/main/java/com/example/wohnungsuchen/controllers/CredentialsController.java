@@ -3,6 +3,7 @@ package com.example.wohnungsuchen.controllers;
 import com.example.wohnungsuchen.models.ProfileModel;
 import com.example.wohnungsuchen.services.CredentialsService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,6 +19,6 @@ public class CredentialsController {
 
     @GetMapping("/v1/{id}")
     public ProfileModel getProfile(@PathVariable Long id) {
-        return credentialsService.getProfileById(id);
+        return ResponseEntity.ok(credentialsService.getProfileById(id)).getBody();
     }
 }

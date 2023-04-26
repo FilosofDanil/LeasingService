@@ -9,6 +9,4 @@ import java.util.*;
 
 public interface OffersRepository extends CrudRepository<Offers, Long> {
     Page<Offers> findAll(Pageable pageable);
-
-    List<Offers> findOffersByCity(String city);
 }
