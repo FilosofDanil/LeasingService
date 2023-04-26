@@ -1,10 +1,7 @@
 package com.example.wohnungsuchen.services;
 
 import com.example.wohnungsuchen.auxiliarymodels.AppointmentDeleteModel;
-import com.example.wohnungsuchen.entities.Appointments;
-import com.example.wohnungsuchen.entities.Credentials;
-import com.example.wohnungsuchen.entities.Leaseholders;
-import com.example.wohnungsuchen.entities.Searchers;
+import com.example.wohnungsuchen.entities.*;
 import com.example.wohnungsuchen.models.AppointmentModel;
 import com.example.wohnungsuchen.postmodels.AppointmentPostModel;
 import com.example.wohnungsuchen.repositories.*;
@@ -68,6 +65,10 @@ public class AppointmentService {
         sendMessage(searcher.getCredentials(), appointment);
     }
 
+    public void assignAppointmentToRandomUsers(Long appointment_id, Integer count) {
+        assignSearchersFromList(appointment_id, generateRandomList(count));
+    }
+
     public void deleteAppointment(Long id) {
         appointmentsRepository.deleteById(id);
     }
@@ -128,6 +129,29 @@ public class AppointmentService {
         List<Appointments> appointments = new ArrayList<>();
         appointmentsRepository.findAll().forEach(appointments::add);
         return appointments;
+    }
+
+    private void assignSearchersFromList(Long appointment_id, List<Searchers> searchers) {
+        if (appointmentsRepository.findById(appointment_id).isEmpty()) {
+            throw new NullPointerException();
+        }
+        Appointments appointment = appointmentsRepository.findById(appointment_id).get();
+        for (Searchers searcher : searchers) {
+            appointment.getSearchers().add(searcher);
+        }
+        appointmentsRepository.save(appointment);
+    }
+
+    private List<Searchers> generateRandomList(int count) {
+        List<Searchers> searchers = new ArrayList<>();
+        searchersRepository.findAll().forEach(searchers::add);
+        List<Searchers> randomList = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            int r = (int) (Math.random() * searchers.size());
+            randomList.add(searchers.get(r));
+            searchers.remove(r);
+        }
+        return randomList;
     }
 
     static class AppointmentMapper {

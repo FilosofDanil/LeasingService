@@ -64,6 +64,7 @@ public class CredentialsService {
         if (user.getRole().equals(Role.SEARCHER.getAuthority())) {
             Searchers searcher = Searchers.builder()
                     .credentials(credentials)
+                    .notifications(true)
                     .build();
             searchersRepository.save(searcher);
         }

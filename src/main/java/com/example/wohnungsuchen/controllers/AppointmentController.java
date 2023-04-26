@@ -50,9 +50,10 @@ public class AppointmentController {
         return new ResponseEntity<>(savedAppointment, HttpStatus.CREATED);
     }
 
-    @PostMapping("/random")
-    public void assignAppointmentForRandomSearchers(@RequestBody AppointmentPostModel appointmentPostModel) {
-
+    @PostMapping("/random/{appointment_id}")
+    public HttpStatus assignAppointmentForRandomSearchers(@RequestBody Integer count, @PathVariable Long appointment_id) {
+        appointmentService.assignAppointmentToRandomUsers(appointment_id, count);
+        return HttpStatus.CREATED;
     }
 
     @DeleteMapping("/{id}")
