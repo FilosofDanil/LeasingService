@@ -1,6 +1,8 @@
 package com.example.wohnungsuchen.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,9 +20,11 @@ public class Assignments {
     private Long id;
     @ManyToOne()
     @JoinColumn(name = "searcher_id", nullable = false, referencedColumnName = "id")
+    @NotNull
     private Searchers searcher;
     @ManyToOne()
     @JoinColumn(name = "appointment_id", nullable = false, referencedColumnName = "id")
+    @NotNull
     private Appointments appointment;
     @Column(name = "notified", nullable = true)
     private Boolean notified;

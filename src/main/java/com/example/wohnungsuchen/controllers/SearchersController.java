@@ -2,11 +2,11 @@ package com.example.wohnungsuchen.controllers;
 
 import com.example.wohnungsuchen.services.SearchersService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/v1/searchers")
@@ -24,5 +24,15 @@ public class SearchersController {
     @PatchMapping("/disable/{searcher_id}")
     public void disableNotifications(@PathVariable Long searcher_id) {
         searchersService.disableNotification(searcher_id);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ResponseEntity<String> onMethodArgumentNotValidException(
+            MethodArgumentNotValidException e) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(e.getMessage());
     }
 }

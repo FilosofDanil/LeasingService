@@ -5,11 +5,13 @@ import com.example.wohnungsuchen.entities.Appointments;
 import com.example.wohnungsuchen.models.AppointmentModel;
 import com.example.wohnungsuchen.postmodels.AppointmentPostModel;
 import com.example.wohnungsuchen.services.AppointmentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -67,13 +69,23 @@ public class AppointmentController {
     }
 
     @PutMapping("/{id}")
-    public void updateAppointment(@PathVariable Long id, @RequestBody AppointmentPostModel appointmentPostModel) {
+    public void updateAppointment(@PathVariable Long id, @Valid @RequestBody AppointmentPostModel appointmentPostModel) {
         appointmentService.updateAppointment(appointmentPostModel, id, SecurityContextHolder.getContext().getAuthentication());
     }
 
     @PatchMapping
     public void partlyUpdateAppointment() {
 
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ResponseEntity<String> onMethodArgumentNotValidException(
+            MethodArgumentNotValidException e) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(e.getMessage());
     }
 
 }

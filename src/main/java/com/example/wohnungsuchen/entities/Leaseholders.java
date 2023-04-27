@@ -1,6 +1,7 @@
 package com.example.wohnungsuchen.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,6 +20,7 @@ public class Leaseholders {
 
     @OneToOne
     @JoinColumn(name = "credit_id", referencedColumnName = "id", nullable = false, unique = true)
+    @NotNull
     private Credentials credentials;
 
     @Column(name = "firma_name")
