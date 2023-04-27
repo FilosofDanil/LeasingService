@@ -12,6 +12,9 @@ import com.example.wohnungsuchen.repositories.CredentialsRepository;
 import com.example.wohnungsuchen.repositories.ImagesRepository;
 import com.example.wohnungsuchen.repositories.LeaseholdersRepository;
 import com.example.wohnungsuchen.repositories.OffersRepository;
+import com.example.wohnungsuchen.sorters.offersorters.Direction;
+import com.example.wohnungsuchen.sorters.offersorters.OfferDateComparator;
+import com.example.wohnungsuchen.sorters.offersorters.OfferComparatorsFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -34,15 +37,21 @@ public class OfferService {
     private final ImagesRepository imagesRepository;
     private final LeaseholdersRepository leaseholdersRepository;
 
-    public List<OfferModel> getAllOffers(String filter) throws ParseException {
+    public List<OfferModel> getAllOffers(String filter, String sort, String direction) throws ParseException {
         List<Offers> list = doFilter(getOffersList(), detectFiltrationMethods(divideString(filter)), getParametersMap(divideString(filter)));
         return list.stream()
                 .map(OfferMapper::toModel)
                 .collect(Collectors.toList());
     }
 
-    public List<OfferModel> getAllOffers() {
+    public List<OfferModel> getAllOffers(String sort, String direction) {
         List<Offers> list = getOffersList();
+        if (sort == null) {
+            list.sort(new OfferDateComparator(Direction.DESC));
+        } else {
+            OfferComparatorsFactory offerComparatorsFactory = new OfferComparatorsFactory();
+            list.sort(offerComparatorsFactory.getSorter(sort + direction));
+        }
         return list.stream()
                 .map(OfferMapper::toModel)
                 .collect(Collectors.toList());

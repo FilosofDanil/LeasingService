@@ -1,8 +1,6 @@
 package com.example.wohnungsuchen.controllers;
 
 import com.example.wohnungsuchen.auth.JwtAuthentication;
-import com.example.wohnungsuchen.entities.Credentials;
-import com.example.wohnungsuchen.entities.Leaseholders;
 import com.example.wohnungsuchen.entities.Offers;
 import com.example.wohnungsuchen.models.CreatedOfferModel;
 import com.example.wohnungsuchen.models.OfferModel;
@@ -17,8 +15,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -34,12 +30,12 @@ public class OfferController {
     private final AuthService authService;
 
     @GetMapping("/v1")
-    public List<OfferModel> getAllOffers(@RequestParam(required = false) String filter) throws ParseException {
+    public List<OfferModel> getAllOffers(@RequestParam(required = false) String filter, @RequestParam(required = false) String sort, @RequestParam(required = false) String direction) throws ParseException {
         final JwtAuthentication authInfo = authService.getAuthInfo();
         if (filter == null) {
-            return ResponseEntity.ok(offerService.getAllOffers()).getBody();
+            return ResponseEntity.ok(offerService.getAllOffers(sort, direction)).getBody();
         }
-        return ResponseEntity.ok(offerService.getAllOffers(filter)).getBody();
+        return ResponseEntity.ok(offerService.getAllOffers(filter, sort, direction)).getBody();
     }
 
     @GetMapping("/v2")

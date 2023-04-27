@@ -1,4 +1,5 @@
 package com.example.wohnungsuchen.sorters.offersorters;
 
-public class OfferDateSorter {
+public class OfferTitleComparator {
+    //soon
 }

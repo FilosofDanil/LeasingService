@@ -34,7 +34,7 @@ public class AuthService {
             refreshStorage.put(credentials.getEmail(), refreshToken);
             return new JwtResponse(accessToken, refreshToken);
         } else {
-            throw new AuthException("Неправильный пароль");
+            throw new AuthException("Invalid password or your account is not verified");
         }
     }
 
@@ -67,7 +67,7 @@ public class AuthService {
                 return new JwtResponse(accessToken, newRefreshToken);
             }
         }
-        throw new AuthException("Невалидный JWT токен");
+        throw new AuthException("Invalid JWT-token");
     }
 
     public void signup(UserPostModel userPostModel) {

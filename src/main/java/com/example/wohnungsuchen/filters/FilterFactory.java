@@ -3,7 +3,7 @@ package com.example.wohnungsuchen.filters;
 import java.util.HashMap;
 
 public class FilterFactory {
-    HashMap<String, IFilter> filterHashMap;
+    private HashMap<String, IFilter> filterHashMap;
 
     public FilterFactory() {
         init();
