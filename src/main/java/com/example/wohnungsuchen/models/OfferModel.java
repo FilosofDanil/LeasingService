@@ -54,4 +54,7 @@ public class OfferModel {
 
     @JsonProperty("image_link")
     private String link;
+
+    @JsonProperty("likes_link")
+    private String likes_link;
 }

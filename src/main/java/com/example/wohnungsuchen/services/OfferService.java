@@ -5,7 +5,6 @@ import com.example.wohnungsuchen.entities.Leaseholders;
 import com.example.wohnungsuchen.entities.Offers;
 import com.example.wohnungsuchen.filters.FilterFactory;
 import com.example.wohnungsuchen.filters.IFilter;
-import com.example.wohnungsuchen.models.CreatedOfferModel;
 import com.example.wohnungsuchen.models.OfferModel;
 import com.example.wohnungsuchen.postmodels.OfferPostModel;
 import com.example.wohnungsuchen.repositories.CredentialsRepository;
@@ -13,8 +12,8 @@ import com.example.wohnungsuchen.repositories.ImagesRepository;
 import com.example.wohnungsuchen.repositories.LeaseholdersRepository;
 import com.example.wohnungsuchen.repositories.OffersRepository;
 import com.example.wohnungsuchen.sorters.offersorters.Direction;
-import com.example.wohnungsuchen.sorters.offersorters.OfferDateComparator;
 import com.example.wohnungsuchen.sorters.offersorters.OfferComparatorsFactory;
+import com.example.wohnungsuchen.sorters.offersorters.OfferDateComparator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -39,6 +38,7 @@ public class OfferService {
 
     public List<OfferModel> getAllOffers(String filter, String sort, String direction) throws ParseException {
         List<Offers> list = doFilter(getOffersList(), detectFiltrationMethods(divideString(filter)), getParametersMap(divideString(filter)));
+        sort(list, sort, direction);
         return list.stream()
                 .map(OfferMapper::toModel)
                 .collect(Collectors.toList());
@@ -46,26 +46,30 @@ public class OfferService {
 
     public List<OfferModel> getAllOffers(String sort, String direction) {
         List<Offers> list = getOffersList();
+        sort(list, sort, direction);
+        return list.stream()
+                .map(OfferMapper::toModel)
+                .collect(Collectors.toList());
+    }
+
+    private void sort(List<Offers> list, String sort, String direction) {
         if (sort == null) {
             list.sort(new OfferDateComparator(Direction.DESC));
         } else {
             OfferComparatorsFactory offerComparatorsFactory = new OfferComparatorsFactory();
             list.sort(offerComparatorsFactory.getSorter(sort + direction));
         }
-        return list.stream()
-                .map(OfferMapper::toModel)
-                .collect(Collectors.toList());
     }
 
     public Page<OfferModel> getAllOffersPage(Pageable pageable) {
         return offersRepository.findAll(pageable).map(OfferMapper::toModel);
     }
 
-    public List<CreatedOfferModel> getAllCreatedOffersByLeaseholderId(Long leaseholder_id) {
+    public List<OfferModel> getAllCreatedOffersByLeaseholderId(Long leaseholder_id) {
         return getOffersList()
                 .stream()
                 .filter(offers -> offers.getLeaseholders().getId().equals(leaseholder_id))
-                .map(OfferMapper::toCreatedOfferModel)
+                .map(OfferMapper::toModel)
                 .collect(Collectors.toList());
     }
 
@@ -188,6 +192,9 @@ public class OfferService {
         String name = auth.getName();
         List<Credentials> credentials = new ArrayList<>();
         credentialsRepository.findAll().forEach(credentials::add);
+        if (credentials.isEmpty()) {
+            throw new NullPointerException();
+        }
         Credentials cred = credentials.stream().filter(credentials1 -> credentials1.getProfile_name().equals(name)).findFirst().get();
         return leaseholdersRepository.findByCredentials(cred);
     }
@@ -199,26 +206,6 @@ public class OfferService {
     }
 
     static class OfferMapper {
-        private static CreatedOfferModel toCreatedOfferModel(Offers offer) {
-            return CreatedOfferModel.builder()
-                    .id(offer.getId())
-                    .address(offer.getAddress())
-                    .area(offer.getArea())
-                    .balkoon(offer.getBalkoon())
-                    .link(offer.getImage().getLink())
-                    .city(offer.getCity())
-                    .coldArend(offer.getColdArend())
-                    .warmArend(offer.getWarmArend())
-                    .postdate(offer.getPost_date())
-                    .rooms(offer.getRooms())
-                    .floor(offer.getFloor())
-                    .description(offer.getDescription())
-                    .internet(offer.getInternet())
-                    .title(offer.getTitle())
-                    .likes_link("http://localhost:8080/api/likes/v1/" + offer.getId())
-                    .build();
-        }
-
         private static OfferModel toModel(Offers offer) {
             return OfferModel.builder()
                     .id(offer.getId())
@@ -235,6 +222,7 @@ public class OfferService {
                     .description(offer.getDescription())
                     .internet(offer.getInternet())
                     .title(offer.getTitle())
+                    .likes_link("http://localhost:8080/api/likes/v1/" + offer.getId())
                     .build();
         }
 

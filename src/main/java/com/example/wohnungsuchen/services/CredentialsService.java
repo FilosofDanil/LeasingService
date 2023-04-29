@@ -5,6 +5,7 @@ import com.example.wohnungsuchen.auxiliarymodels.EmailModel;
 import com.example.wohnungsuchen.entities.Credentials;
 import com.example.wohnungsuchen.entities.Leaseholders;
 import com.example.wohnungsuchen.entities.Searchers;
+import com.example.wohnungsuchen.exeptions.VerifyException;
 import com.example.wohnungsuchen.models.ProfileModel;
 import com.example.wohnungsuchen.postmodels.UserPostModel;
 import com.example.wohnungsuchen.repositories.CredentialsRepository;
@@ -15,7 +16,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
+import org.webjars.NotFoundException;
 
 import java.util.*;
 
@@ -40,6 +41,9 @@ public class CredentialsService {
     public void activate(String code) {
         if (isActivated(code)) {
             Credentials credentials = credentialsRepository.findCreditsByActivationCode(code);
+            if (credentials == null) {
+                throw new IllegalArgumentException();
+            }
             credentials.setVerified(true);
             credentials.setActivationCode(null);
             credentialsRepository.save(credentials);
@@ -75,7 +79,7 @@ public class CredentialsService {
     public void sendActivationCode(EmailModel email) {
         Credentials credentials = credentialsRepository.findByEmail(email.getEmail());
         if (credentials.getVerified()) {
-            throw new RuntimeException();
+            throw new VerifyException("Already verified");
         }
         if (credentials.getActivationCode() == null) {
             credentials.setActivationCode(UUID.randomUUID().toString());
@@ -118,6 +122,9 @@ public class CredentialsService {
     }
 
     public void deleteCredentials(Long id) {
+        if (credentialsRepository.findById(id).isEmpty()) {
+            throw new NotFoundException("");
+        }
         Credentials credentials = credentialsRepository.findById(id).get();
         leaseholdersRepository.findAll().forEach(leaseholders -> {
             if (leaseholders.getCredentials().equals(credentials)) {
@@ -133,17 +140,15 @@ public class CredentialsService {
     }
 
     public ProfileModel getProfileById(Long id) {
-        List<Credentials> credentialsList = getAllCredits();
-        if (credentialsList.stream().findAny().isEmpty()) {
-            throw new NullPointerException();
+        if (credentialsRepository.findById(id).isEmpty()) {
+            throw new NotFoundException("");
         }
-        return UserMapper.toProfileModel(credentialsList.stream().findFirst().get());
+        Credentials credentials = credentialsRepository.findById(id).get();
+        return UserMapper.toProfileModel(credentials, searchersRepository.findSearchersByCredentials(credentials));
     }
 
-
-
     static class UserMapper {
-//        private static User format(Credentials credentials){
+        //        private static User format(Credentials credentials){
 //            return User.builder()
 //                    .profile_name(credentials.getProfile_name())
 //                    .profile_password(credentials.getPassword())
@@ -151,8 +156,6 @@ public class CredentialsService {
 //                    .email(credentials.getEmail())
 //                    .build();
 //        }
-
-
         private static Credentials toCredits(UserPostModel user) {
             return Credentials.builder()
                     .profile_name(user.getProfile_name())
@@ -165,7 +168,11 @@ public class CredentialsService {
                     .build();
         }
 
-        private static ProfileModel toProfileModel(Credentials credentials) {
+        private static ProfileModel toProfileModel(Credentials credentials, Searchers searchers) {
+            String link = "disable";
+            if (searchers.getNotifications()) {
+                link = "enable";
+            }
             return ProfileModel.builder()
                     .id(credentials.getId())
                     .name(credentials.getProfile_name())
@@ -174,6 +181,7 @@ public class CredentialsService {
                     .email(credentials.getEmail())
                     .verified(credentials.getVerified())
                     .date_of_birth(credentials.getBirthDate())
+                    .notificationLink("http://localhost:8080/api/searchers/" + link + "/" + searchers.getId())
                     .build();
         }
     }

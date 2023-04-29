@@ -52,6 +52,9 @@ public class LikeService {
         String name = auth.getName();
         List<Credentials> credentials = new ArrayList<>();
         credentialsRepository.findAll().forEach(credentials::add);
+        if (credentials.isEmpty()) {
+            throw new NullPointerException();
+        }
         Credentials cred = credentials.stream().filter(credentials1 -> credentials1.getProfile_name().equals(name)).findFirst().get();
         return searchersRepository.findSearchersByCredentials(cred);
     }

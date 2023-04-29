@@ -2,7 +2,6 @@ package com.example.wohnungsuchen.controllers;
 
 import com.example.wohnungsuchen.auth.JwtAuthentication;
 import com.example.wohnungsuchen.entities.Offers;
-import com.example.wohnungsuchen.models.CreatedOfferModel;
 import com.example.wohnungsuchen.models.OfferModel;
 import com.example.wohnungsuchen.postmodels.OfferPostModel;
 import com.example.wohnungsuchen.services.AuthService;
@@ -52,7 +51,7 @@ public class OfferController {
 
     @PreAuthorize("hasAuthority('LEASEHOLDER')")
     @GetMapping("/v1/{leaseholder_id}")
-    public List<CreatedOfferModel> getAllCreatedOffersByLeaseholder(@PathVariable Long leaseholder_id) {
+    public List<OfferModel> getAllCreatedOffersByLeaseholder(@PathVariable Long leaseholder_id) {
         return ResponseEntity.ok(offerService.getAllCreatedOffersByLeaseholderId(leaseholder_id)).getBody();
     }
 
