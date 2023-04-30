@@ -1,4 +1,4 @@
-package com.example.wohnungsuchen.models;
+package com.example.wohnungsuchen.models.LikesModels;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -23,8 +23,8 @@ public class LikeModel {
     private String username;
     @JsonProperty("surname")
     private String surname;
-    @JsonProperty("profile_link")
-    private String profileLink;
-    @JsonProperty("appointment_link")
-    private String appointmentLink;
+//    @JsonProperty("profile_link")
+//    private String profileLink;
+//    @JsonProperty("appointment_link")
+//    private String appointmentLink;
 }

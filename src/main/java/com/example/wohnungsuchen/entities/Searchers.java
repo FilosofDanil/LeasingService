@@ -7,7 +7,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import net.minidev.json.annotate.JsonIgnore;
 import org.hibernate.validator.constraints.Length;
+
+import java.util.Set;
 
 @Entity
 @Table(name = "searchers")
@@ -29,6 +32,14 @@ public class Searchers {
     @NotBlank
     @Length(min = 2)
     private String city;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "searcher", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    Set<Liked> likes;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "searcher", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    Set<Assignments> assignments;
 
     @Column(name = "notifications", nullable = false)
     private Boolean notifications;

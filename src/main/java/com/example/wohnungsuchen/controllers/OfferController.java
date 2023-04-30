@@ -5,8 +5,10 @@ import com.example.wohnungsuchen.entities.Offers;
 import com.example.wohnungsuchen.models.OfferModel;
 import com.example.wohnungsuchen.postmodels.OfferPostModel;
 import com.example.wohnungsuchen.services.AuthService;
+import com.example.wohnungsuchen.services.ImageService;
 import com.example.wohnungsuchen.services.OfferService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -17,9 +19,13 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("api/offers")
@@ -27,6 +33,7 @@ import java.util.List;
 public class OfferController {
     private final OfferService offerService;
     private final AuthService authService;
+    private final ImageService imageService;
 
     @GetMapping("/v1")
     public List<OfferModel> getAllOffers(@RequestParam(required = false) String filter, @RequestParam(required = false) String sort, @RequestParam(required = false) String direction) throws ParseException {
@@ -56,14 +63,11 @@ public class OfferController {
     }
 
     @PreAuthorize("hasAuthority('LEASEHOLDER')")
-    @GetMapping("/{id}")
-    public OfferModel getOfferById(@PathVariable Long id) {
-        return null;
-    }
-
-    @PreAuthorize("hasAuthority('LEASEHOLDER')")
     @PostMapping("/")
-    public ResponseEntity<Offers> addOffer(@RequestBody OfferPostModel offerPostModel) {
+    public ResponseEntity<Offers> addOffer(@RequestBody OfferPostModel offerPostModel, @RequestParam(required = false) MultipartFile file) throws IOException {
+        if (file != null) {
+            imageService.addFile(file);
+        }
         Offers savedOffer = offerService.addOffer(offerPostModel, SecurityContextHolder.getContext().getAuthentication());
         return new ResponseEntity<>(savedOffer, HttpStatus.CREATED);
     }

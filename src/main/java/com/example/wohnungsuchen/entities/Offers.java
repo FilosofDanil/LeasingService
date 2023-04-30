@@ -9,9 +9,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import net.minidev.json.annotate.JsonIgnore;
 import org.hibernate.validator.constraints.Length;
 
 import java.util.Date;
+import java.util.Set;
 
 @Entity
 @Table(name = "offers")
@@ -72,6 +74,13 @@ public class Offers {
     @JoinColumn(name = "leaseholder_id", referencedColumnName = "id", nullable = false)
     @NotNull
     private Leaseholders leaseholders;
+    @JsonIgnore
+    @OneToMany(mappedBy = "offer", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    Set<Liked> likes;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "offer", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    Set<Appointments> appointments;
 
     public Offers() {
     }

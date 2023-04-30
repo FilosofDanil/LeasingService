@@ -34,7 +34,7 @@ public class AppointmentController {
     }
 
     @PreAuthorize("hasAuthority('LEASEHOLDER')")
-    @GetMapping("/Leaseholder/{id}")
+    @GetMapping("/leaseholder/{id}")
     public List<AppointmentModel> getAppointmentsCreatedByCertainLeaseholder(@PathVariable Long id) {
         return ResponseEntity.ok(appointmentService.getAppointmentsCreatedByCertainLeaseholder(id)).getBody();
     }

@@ -5,6 +5,7 @@ import com.example.wohnungsuchen.auxiliarymodels.EmailModel;
 import com.example.wohnungsuchen.entities.Credentials;
 import com.example.wohnungsuchen.entities.Leaseholders;
 import com.example.wohnungsuchen.entities.Searchers;
+import com.example.wohnungsuchen.exeptions.RegistryException;
 import com.example.wohnungsuchen.exeptions.VerifyException;
 import com.example.wohnungsuchen.models.profilemodels.ProfileLeaseHolderModel;
 import com.example.wohnungsuchen.models.profilemodels.ProfileModel;
@@ -54,7 +55,7 @@ public class CredentialsService {
 
     public void sign_up(UserPostModel user) {
         if (getByLogin(user.getEmail()).isPresent()) {
-            throw new RuntimeException();
+            throw new RegistryException();
         }
         Credentials credentials = UserMapper.toCredits(user);
         credentials.setActivationCode(UUID.randomUUID().toString());
@@ -125,7 +126,7 @@ public class CredentialsService {
 
     public void deleteCredentials(Long id) {
         if (credentialsRepository.findById(id).isEmpty()) {
-            throw new NotFoundException("");
+            throw new NotFoundException("Failed to delete");
         }
         Credentials credentials = credentialsRepository.findById(id).get();
         leaseholdersRepository.findAll().forEach(leaseholders -> {

@@ -9,17 +9,17 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api/profile")
+@RequestMapping("api/v1/profile")
 @RequiredArgsConstructor
 public class CredentialsController {
     private final CredentialsService credentialsService;
 
-    @DeleteMapping("/v1/{id}")
+    @DeleteMapping("/{id}")
     public void deleteCredentials(@PathVariable Long id) {
         credentialsService.deleteCredentials(id);
     }
 
-    @GetMapping("/v1/{id}")
+    @GetMapping("/{id}")
     public ProfileModel getProfile(@PathVariable Long id) {
         return ResponseEntity.ok(credentialsService.getProfileById(id)).getBody();
     }

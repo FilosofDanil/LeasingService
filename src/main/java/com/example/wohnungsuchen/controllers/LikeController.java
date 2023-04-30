@@ -1,8 +1,7 @@
 package com.example.wohnungsuchen.controllers;
 
 import com.example.wohnungsuchen.entities.Liked;
-import com.example.wohnungsuchen.models.LikeModel;
-import com.example.wohnungsuchen.postmodels.LikePostModel;
+import com.example.wohnungsuchen.models.LikesModels.LikeModel;
 import com.example.wohnungsuchen.services.LikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -12,25 +11,31 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.List;
 
 @RestController
-@RequestMapping("/api/likes")
+@RequestMapping("/api/v1/likes")
 @RequiredArgsConstructor
-public class LikeConroller {
+public class LikeController {
     private final LikeService likedService;
 
     @PreAuthorize("hasAuthority('SEARCHER')")
-    @PostMapping("/")
-    public ResponseEntity<Liked> like(@RequestBody Long offer_id) {
+    @PostMapping("/{offer_id}")
+    public ResponseEntity<Liked> like(@PathVariable Long offer_id) {
         Liked savedLike = likedService.like(offer_id, SecurityContextHolder.getContext().getAuthentication());
         return new ResponseEntity<>(savedLike, HttpStatus.CREATED);
     }
 
     @PreAuthorize("hasAuthority('LEASEHOLDER')")
-    @GetMapping("/v1/{offer_id}")
+    @GetMapping("/{offer_id}")
     public List<LikeModel> getAllLikesByOffer(@PathVariable Long offer_id) {
         return ResponseEntity.ok(likedService.getAllLikesByOffer(offer_id)).getBody();
+    }
+
+    @PreAuthorize("hasAuthority('SEARCHER')")
+    @GetMapping("/")
+    public List<LikeModel> getAllLikesByUser() {
+        return ResponseEntity.ok(likedService.getAllLikesByUser(SecurityContextHolder.getContext().getAuthentication())).getBody();
     }
 
     @DeleteMapping("/{like_id}")

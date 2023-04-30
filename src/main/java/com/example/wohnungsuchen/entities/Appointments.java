@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import net.minidev.json.annotate.JsonIgnore;
 
 import java.sql.Time;
 import java.util.Date;
@@ -52,6 +53,9 @@ public class Appointments {
     private Time meeting_time;
     @Column(name = "description", nullable = true)
     private String description;
+    @JsonIgnore
+    @OneToMany(mappedBy = "appointment", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    Set<Assignments> assignments;
 
     public Appointments() {
     }

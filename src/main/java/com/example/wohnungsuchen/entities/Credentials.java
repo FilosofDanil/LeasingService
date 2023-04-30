@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import net.minidev.json.annotate.JsonIgnore;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -62,6 +63,12 @@ public class Credentials implements UserDetails {
     private Set<Role> roles = new HashSet<>();
     @Column(name = "activation_code")
     private String activationCode;
+//    @JsonIgnore
+//    @OneToOne(mappedBy = "credentials", cascade = CascadeType.REMOVE, orphanRemoval = true)
+//    Searchers searchers;
+//    @JsonIgnore
+//    @OneToOne(mappedBy = "credentials", cascade = CascadeType.REMOVE, orphanRemoval = true)
+//    Leaseholders leaseholders;
 
     public Credentials() {
     }

@@ -114,10 +114,10 @@ public class AppointmentService {
     }
 
     private Leaseholders getLeaseholderByName(Authentication auth) {
-        String name = auth.getName();
+        String username = (String)auth.getPrincipal();
         List<Credentials> credentials = new ArrayList<>();
         credentialsRepository.findAll().forEach(credentials::add);
-        Credentials cred = credentials.stream().filter(credentials1 -> credentials1.getProfile_name().equals(name)).findFirst().get();
+        Credentials cred = credentials.stream().filter(credentials1 -> credentials1.getEmail().equals(username)).findFirst().get();
         return leaseholdersRepository.findByCredentials(cred);
     }
 
