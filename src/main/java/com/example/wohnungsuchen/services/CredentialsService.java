@@ -6,7 +6,9 @@ import com.example.wohnungsuchen.entities.Credentials;
 import com.example.wohnungsuchen.entities.Leaseholders;
 import com.example.wohnungsuchen.entities.Searchers;
 import com.example.wohnungsuchen.exeptions.VerifyException;
-import com.example.wohnungsuchen.models.ProfileModel;
+import com.example.wohnungsuchen.models.profilemodels.ProfileLeaseHolderModel;
+import com.example.wohnungsuchen.models.profilemodels.ProfileModel;
+import com.example.wohnungsuchen.models.profilemodels.ProfileSearcherModel;
 import com.example.wohnungsuchen.postmodels.UserPostModel;
 import com.example.wohnungsuchen.repositories.CredentialsRepository;
 import com.example.wohnungsuchen.repositories.LeaseholdersRepository;
@@ -144,7 +146,14 @@ public class CredentialsService {
             throw new NotFoundException("");
         }
         Credentials credentials = credentialsRepository.findById(id).get();
-        return UserMapper.toProfileModel(credentials, searchersRepository.findSearchersByCredentials(credentials));
+        Object o = null;
+        if (searchersRepository.findSearchersByCredentials(credentials) != null) {
+            o = searchersRepository.findSearchersByCredentials(credentials);
+        }
+        if (leaseholdersRepository.findByCredentials(credentials) != null) {
+            o = leaseholdersRepository.findByCredentials(credentials);
+        }
+        return UserMapper.toProfileModel(credentials, o);
     }
 
     static class UserMapper {
@@ -168,12 +177,8 @@ public class CredentialsService {
                     .build();
         }
 
-        private static ProfileModel toProfileModel(Credentials credentials, Searchers searchers) {
-            String link = "disable";
-            if (searchers.getNotifications()) {
-                link = "enable";
-            }
-            return ProfileModel.builder()
+        private static ProfileModel toProfileModel(Credentials credentials, Object o) {
+            ProfileModel profileModel = ProfileModel.builder()
                     .id(credentials.getId())
                     .name(credentials.getProfile_name())
                     .surname(credentials.getSurname())
@@ -181,8 +186,22 @@ public class CredentialsService {
                     .email(credentials.getEmail())
                     .verified(credentials.getVerified())
                     .date_of_birth(credentials.getBirthDate())
-                    .notificationLink("http://localhost:8080/api/searchers/" + link + "/" + searchers.getId())
                     .build();
+            if (o instanceof Searchers searchers) {
+                String link = "disable";
+                if (searchers.getNotifications()) {
+                    link = "enable";
+                }
+                ProfileSearcherModel profileSearcherModel = new ProfileSearcherModel(profileModel.getId(), profileModel.getName(), profileModel.getSurname(), profileModel.getPhone(), profileModel.getEmail(), profileModel.getVerified(), profileModel.getDate_of_birth());
+                profileSearcherModel.setNotificationLink("http://localhost:8080/api/searchers/" + link + "/" + searchers.getId());
+                return profileSearcherModel;
+            }
+            if (o instanceof Leaseholders leaseholders) {
+                ProfileLeaseHolderModel profileLeaseHolderModel = new ProfileLeaseHolderModel(profileModel.getId(), profileModel.getName(), profileModel.getSurname(), profileModel.getPhone(), profileModel.getEmail(), profileModel.getVerified(), profileModel.getDate_of_birth());
+                profileLeaseHolderModel.setOffersLink("http://localhost:8080/api/offers/" + leaseholders.getId());
+                return profileLeaseHolderModel;
+            }
+            return profileModel;
         }
     }
 }

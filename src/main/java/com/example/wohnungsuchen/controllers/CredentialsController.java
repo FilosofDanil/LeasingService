@@ -1,6 +1,6 @@
 package com.example.wohnungsuchen.controllers;
 
-import com.example.wohnungsuchen.models.ProfileModel;
+import com.example.wohnungsuchen.models.profilemodels.ProfileModel;
 import com.example.wohnungsuchen.services.CredentialsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

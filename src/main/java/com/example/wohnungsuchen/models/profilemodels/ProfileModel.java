@@ -1,4 +1,4 @@
-package com.example.wohnungsuchen.models;
+package com.example.wohnungsuchen.models.profilemodels;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -27,6 +27,4 @@ public class ProfileModel {
     private Boolean verified;
     @JsonProperty("date_of_birth")
     private Date date_of_birth;
-    @JsonProperty("notifications")
-    private String notificationLink;
 }

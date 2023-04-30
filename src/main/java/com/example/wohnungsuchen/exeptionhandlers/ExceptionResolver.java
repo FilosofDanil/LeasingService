@@ -1,13 +1,11 @@
 package com.example.wohnungsuchen.exeptionhandlers;
 
 import com.example.wohnungsuchen.exeptions.VerifyException;
-import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.AbstractHandlerExceptionResolver;
 import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
@@ -20,6 +18,7 @@ public class ExceptionResolver extends AbstractHandlerExceptionResolver {
     @Override
     protected ModelAndView doResolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
         final ModelAndView modelAndView = new ModelAndView(new MappingJackson2JsonView());
+        logger.error(ex.getMessage(), ex);
         if (ex instanceof NotFoundException) {
             modelAndView.setStatus(HttpStatus.BAD_REQUEST);
             modelAndView.addObject("message", "Resource is not found!");
@@ -52,7 +51,6 @@ public class ExceptionResolver extends AbstractHandlerExceptionResolver {
         }
         modelAndView.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
         modelAndView.addObject("message", "Something went wrong on the server!");
-        logger.error(ex.getMessage(), ex);
         return modelAndView;
     }
 }

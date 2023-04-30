@@ -22,7 +22,7 @@ import java.text.ParseException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/offers")
+@RequestMapping("api/offers")
 @RequiredArgsConstructor
 public class OfferController {
     private final OfferService offerService;
@@ -50,7 +50,7 @@ public class OfferController {
     }
 
     @PreAuthorize("hasAuthority('LEASEHOLDER')")
-    @GetMapping("/v1/{leaseholder_id}")
+    @GetMapping("/{leaseholder_id}")
     public List<OfferModel> getAllCreatedOffersByLeaseholder(@PathVariable Long leaseholder_id) {
         return ResponseEntity.ok(offerService.getAllCreatedOffersByLeaseholderId(leaseholder_id)).getBody();
     }
