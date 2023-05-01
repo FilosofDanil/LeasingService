@@ -2,6 +2,7 @@ package com.example.wohnungsuchen.exeptionhandlers;
 
 import com.example.wohnungsuchen.exeptions.RegistryException;
 import com.example.wohnungsuchen.exeptions.VerifyException;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolationException;
@@ -22,7 +23,7 @@ public class ExceptionResolver extends AbstractHandlerExceptionResolver {
         final ModelAndView modelAndView = new ModelAndView(new MappingJackson2JsonView());
         logger.error(ex.getMessage(), ex);
         if (ex instanceof NotFoundException) {
-            if(ex.getMessage().equals("Failed to delete")){
+            if (ex.getMessage().equals("Failed to delete")) {
                 modelAndView.setStatus(HttpStatus.NO_CONTENT);
                 modelAndView.addObject("message", "Resource is already deleted, or not exist!");
                 return modelAndView;
@@ -56,12 +57,12 @@ public class ExceptionResolver extends AbstractHandlerExceptionResolver {
             modelAndView.addObject("message", "You account has been already verified!");
             return modelAndView;
         }
-        if(ex instanceof ConstraintViolationException){
+        if (ex instanceof ConstraintViolationException) {
             modelAndView.setStatus(HttpStatus.BAD_REQUEST);
             modelAndView.addObject("message", "Invalid request data!");
             return modelAndView;
         }
-        if(ex instanceof IOException){
+        if (ex instanceof IOException) {
             modelAndView.setStatus(HttpStatus.BAD_REQUEST);
             modelAndView.addObject("message", "Something went wrong, while trying to add file!");
             return modelAndView;

@@ -1,17 +1,14 @@
 package com.example.wohnungsuchen.controllers;
 
 import com.example.wohnungsuchen.auth.JwtAuthentication;
-import com.example.wohnungsuchen.entities.Offers;
 import com.example.wohnungsuchen.models.OfferModel;
 import com.example.wohnungsuchen.postmodels.OfferPostModel;
 import com.example.wohnungsuchen.services.AuthService;
 import com.example.wohnungsuchen.services.ImageService;
 import com.example.wohnungsuchen.services.OfferService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,11 +18,9 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("api/offers")
@@ -45,16 +40,16 @@ public class OfferController {
     }
 
     @GetMapping("/v2")
-    public Page<OfferModel> getAllOffers(@RequestParam(required = false) String filter, @PageableDefault(sort = {"id"}, direction = Sort.Direction.ASC, size = 5) Pageable pageable) throws ParseException {
+    public Page<OfferModel> getAllOffers(@RequestParam(required = false) String filter, @PageableDefault(size = 5) Pageable pageable, @RequestParam(required = false) String sort, @RequestParam(required = false) String direction) throws ParseException {
         final JwtAuthentication authInfo = authService.getAuthInfo();
-        return ResponseEntity.ok(offerService.getAllOffers(pageable, filter)).getBody();
+        return ResponseEntity.ok(offerService.getAllOffers(pageable, filter, sort, direction)).getBody();
     }
 
-    @GetMapping("/v3")
-    public Page<OfferModel> getAllOffers(@RequestParam(required = false) String sort, @RequestParam(required = false) String direction, @PageableDefault(size = 5, sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) throws ParseException {
-        final JwtAuthentication authInfo = authService.getAuthInfo();
-        return ResponseEntity.ok(offerService.getAllOffersPage(pageable)).getBody();
-    }
+//    @GetMapping("/v3")
+//    public Page<OfferModel> getAllOffers(@RequestParam(required = false) String sort, @RequestParam(required = false) String direction, @PageableDefault(size = 5, sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) throws ParseException {
+//        final JwtAuthentication authInfo = authService.getAuthInfo();
+//        return ResponseEntity.ok(offerService.getAllOffersPage(pageable)).getBody();
+//    }
 
     @PreAuthorize("hasAuthority('LEASEHOLDER')")
     @GetMapping("/{leaseholder_id}")
@@ -64,11 +59,11 @@ public class OfferController {
 
     @PreAuthorize("hasAuthority('LEASEHOLDER')")
     @PostMapping("/")
-    public ResponseEntity<Offers> addOffer(@RequestBody OfferPostModel offerPostModel, @RequestParam(required = false) MultipartFile file) throws IOException {
+    public ResponseEntity<OfferModel> addOffer(@RequestBody OfferPostModel offerPostModel, @RequestParam(required = false) MultipartFile file) throws IOException {
         if (file != null) {
             imageService.addFile(file);
         }
-        Offers savedOffer = offerService.addOffer(offerPostModel, SecurityContextHolder.getContext().getAuthentication());
+        OfferModel savedOffer = offerService.addOffer(offerPostModel, SecurityContextHolder.getContext().getAuthentication());
         return new ResponseEntity<>(savedOffer, HttpStatus.CREATED);
     }
 

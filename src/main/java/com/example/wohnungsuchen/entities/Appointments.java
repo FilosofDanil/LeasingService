@@ -1,9 +1,7 @@
 package com.example.wohnungsuchen.entities;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -49,7 +47,6 @@ public class Appointments {
     private Date meeting_date;
     @Column(name = "meeting_time", nullable = false)
     @NotNull
-    @Pattern(regexp = "^[0-1][0-9]:[0-5][0-9]|[1-2][0-3]:[0-5][0-9]$")
     private Time meeting_time;
     @Column(name = "description", nullable = true)
     private String description;

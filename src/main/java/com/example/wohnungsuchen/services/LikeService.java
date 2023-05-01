@@ -27,7 +27,7 @@ public class LikeService {
     private final SearchersRepository searchersRepository;
     private final CredentialsRepository credentialsRepository;
 
-    public Liked like(Long offer_id, Authentication auth) {
+    public LikeModel like(Long offer_id, Authentication auth) {
         if (offersRepository.findById(offer_id).isEmpty()) {
             throw new NullPointerException();
         }
@@ -36,7 +36,7 @@ public class LikeService {
                 .searcher(getSearcherByName(auth))
                 .build();
         likedRepository.save(liked);
-        return liked;
+        return LikedMapper.toModel(liked, new Object());
     }
 
     public List<LikeModel> getAllLikesByOffer(Long offer_id) {

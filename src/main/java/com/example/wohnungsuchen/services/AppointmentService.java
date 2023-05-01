@@ -1,7 +1,10 @@
 package com.example.wohnungsuchen.services;
 
 import com.example.wohnungsuchen.auxiliarymodels.AppointmentDeleteModel;
-import com.example.wohnungsuchen.entities.*;
+import com.example.wohnungsuchen.entities.Appointments;
+import com.example.wohnungsuchen.entities.Credentials;
+import com.example.wohnungsuchen.entities.Leaseholders;
+import com.example.wohnungsuchen.entities.Searchers;
 import com.example.wohnungsuchen.models.AppointmentModel;
 import com.example.wohnungsuchen.postmodels.AppointmentPostModel;
 import com.example.wohnungsuchen.repositories.*;
@@ -47,11 +50,11 @@ public class AppointmentService {
                 .collect(Collectors.toList());
     }
 
-    public Appointments addAppointment(AppointmentPostModel appointmentPostModel, Authentication auth) {
+    public AppointmentModel addAppointment(AppointmentPostModel appointmentPostModel, Authentication auth) {
         Appointments appointments = AppointmentMapper.toEntity(appointmentPostModel, offersRepository, leaseholdersRepository);
         appointments.setLeaseholder(getLeaseholderByName(auth));
         appointmentsRepository.save(appointments);
-        return appointments;
+        return AppointmentMapper.toModel(appointments);
     }
 
     public void assignAppointmentToCertainUser(Long searchers_id, Long appointment_id) {
@@ -114,7 +117,7 @@ public class AppointmentService {
     }
 
     private Leaseholders getLeaseholderByName(Authentication auth) {
-        String username = (String)auth.getPrincipal();
+        String username = (String) auth.getPrincipal();
         List<Credentials> credentials = new ArrayList<>();
         credentialsRepository.findAll().forEach(credentials::add);
         Credentials cred = credentials.stream().filter(credentials1 -> credentials1.getEmail().equals(username)).findFirst().get();

@@ -61,9 +61,9 @@ public class OfferService {
         }
     }
 
-    public Page<OfferModel> getAllOffersPage(Pageable pageable) {
-        return offersRepository.findAll(pageable).map(OfferMapper::toModel);
-    }
+//    public Page<OfferModel> getAllOffersPage(Pageable pageable) {
+//        return offersRepository.findAll(pageable).map(OfferMapper::toModel);
+//    }
 
     public List<OfferModel> getAllCreatedOffersByLeaseholderId(Long leaseholder_id) {
         return getOffersList()
@@ -73,15 +73,21 @@ public class OfferService {
                 .collect(Collectors.toList());
     }
 
-    public Page<OfferModel> getAllOffers(Pageable pageable, String filter) throws ParseException {
-        List<Offers> list = doFilter(getOffersList(), detectFiltrationMethods(divideString(filter)), getParametersMap(divideString(filter)));
+    public Page<OfferModel> getAllOffers(Pageable pageable, String filter, String sort, String direction) throws ParseException {
+        List<Offers> list = getOffersList();
+        if (filter != null) {
+            list = doFilter(list, detectFiltrationMethods(divideString(filter)), getParametersMap(divideString(filter)));
+        }
+        sort(list, sort, direction);
         List<OfferModel> offerModelList = list.stream()
                 .map(OfferMapper::toModel)
+                .skip((long) pageable.getPageSize() * pageable.getPageNumber())
+                .limit(pageable.getPageSize())
                 .collect(Collectors.toList());
         return new PageImpl<>(offerModelList, pageable, offerModelList.size());
     }
 
-    public Offers addOffer(OfferPostModel offerPostModel, Authentication auth) {
+    public OfferModel addOffer(OfferPostModel offerPostModel, Authentication auth) {
         Offers offer = OfferMapper.toOffer(offerPostModel);
         imagesRepository.findAll().forEach(images -> {
             if (offerPostModel.getLink().equals(images.getLink())) {
@@ -92,7 +98,7 @@ public class OfferService {
         Date postDate = new Date();
         offer.setPost_date(postDate);
         offersRepository.save(offer);
-        return offer;
+        return OfferMapper.toModel(offer);
     }
 
     private List<Offers> doFilter(List<Offers> offers, String[] filter, HashMap<String, String> params) throws ParseException {
@@ -189,7 +195,7 @@ public class OfferService {
     }
 
     private Leaseholders getLeaseholderByName(Authentication auth) {
-        String username = (String)auth.getPrincipal();
+        String username = (String) auth.getPrincipal();
         List<Credentials> credentials = new ArrayList<>();
         credentialsRepository.findAll().forEach(credentials::add);
         if (credentials.isEmpty()) {

@@ -47,8 +47,8 @@ public class AppointmentController {
 
     @PreAuthorize("hasAuthority('LEASEHOLDER')")
     @PostMapping("/")
-    public ResponseEntity<Appointments> addAppointment(@RequestBody AppointmentPostModel appointmentPostModel) {
-        Appointments savedAppointment = appointmentService.addAppointment(appointmentPostModel, SecurityContextHolder.getContext().getAuthentication());
+    public ResponseEntity<AppointmentModel> addAppointment(@RequestBody AppointmentPostModel appointmentPostModel) {
+        AppointmentModel savedAppointment = appointmentService.addAppointment(appointmentPostModel, SecurityContextHolder.getContext().getAuthentication());
         return new ResponseEntity<>(savedAppointment, HttpStatus.CREATED);
     }
 

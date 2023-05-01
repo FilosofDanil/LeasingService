@@ -63,12 +63,6 @@ public class Credentials implements UserDetails {
     private Set<Role> roles = new HashSet<>();
     @Column(name = "activation_code")
     private String activationCode;
-//    @JsonIgnore
-//    @OneToOne(mappedBy = "credentials", cascade = CascadeType.REMOVE, orphanRemoval = true)
-//    Searchers searchers;
-//    @JsonIgnore
-//    @OneToOne(mappedBy = "credentials", cascade = CascadeType.REMOVE, orphanRemoval = true)
-//    Leaseholders leaseholders;
 
     public Credentials() {
     }

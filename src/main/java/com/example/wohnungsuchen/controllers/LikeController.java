@@ -1,6 +1,5 @@
 package com.example.wohnungsuchen.controllers;
 
-import com.example.wohnungsuchen.entities.Liked;
 import com.example.wohnungsuchen.models.LikesModels.LikeModel;
 import com.example.wohnungsuchen.services.LikeService;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +20,8 @@ public class LikeController {
 
     @PreAuthorize("hasAuthority('SEARCHER')")
     @PostMapping("/{offer_id}")
-    public ResponseEntity<Liked> like(@PathVariable Long offer_id) {
-        Liked savedLike = likedService.like(offer_id, SecurityContextHolder.getContext().getAuthentication());
+    public ResponseEntity<LikeModel> like(@PathVariable Long offer_id) {
+        LikeModel savedLike = likedService.like(offer_id, SecurityContextHolder.getContext().getAuthentication());
         return new ResponseEntity<>(savedLike, HttpStatus.CREATED);
     }
 

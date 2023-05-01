@@ -35,27 +35,27 @@ public class Offers {
     private Date post_date;
     @Column(name = "cold_arend", nullable = false)
     @Min(0)
-    @NotBlank
+    @NotNull
     private Double coldArend;
     @Column(name = "warm_arend", nullable = false)
     @Min(0)
-    @NotBlank
+    @NotNull
     private Double warmArend;
     @Column(name = "description")
     private String description;
     @Column(name = "city", nullable = false)
-    @NotBlank
+    @NotNull
     @Length(min = 2)
     private String city;
     @Column(name = "address", nullable = false)
     @NotBlank
     private String address;
     @Column(name = "rooms", nullable = false)
-    @NotBlank
+    @NotNull
     @Min(0)
     private Integer rooms;
     @Column(name = "area", nullable = false)
-    @NotBlank
+    @NotNull
     @Min(0)
     private Double area;
     @Column(name = "internet")
@@ -63,7 +63,7 @@ public class Offers {
     @Column(name = "balkoon")
     private Boolean balkoon;
     @Column(name = "floor", nullable = false)
-    @NotBlank
+    @NotNull
     @Min(0)
     private Integer floor;
     @ManyToOne

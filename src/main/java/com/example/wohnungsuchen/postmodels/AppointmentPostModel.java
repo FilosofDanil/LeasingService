@@ -20,7 +20,7 @@ public class AppointmentPostModel {
     private Date meeting_date;
     @JsonProperty("meeting_time")
     @NotBlank
-    @Pattern(regexp = "^[0-1][0-9]:[0-5][0-9]|[1-2][0-3]:[0-5][0-9]$")
+    @Pattern(regexp = "^[0-1][0-9]:[0-5][0-9]:[0-5][0-9]|[1-2][0-3]:[0-5][0-9]:[0-5][0-9]$")
     private String meeting_time;
     @JsonProperty("description")
     @NotBlank
