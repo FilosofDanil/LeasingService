@@ -1,6 +1,6 @@
 package com.example.wohnungsuchen.auth;
 
-import com.example.wohnungsuchen.entities.Credits;
+import com.example.wohnungsuchen.entities.Credentials;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -12,7 +12,13 @@ import io.jsonwebtoken.security.SignatureException;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.crypto.SecretKey;
 import java.security.Key;
@@ -34,25 +40,25 @@ public class JwtProvider {
         this.jwtAccessSecret = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtAccessSecret));
         this.jwtRefreshSecret = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtRefreshSecret));
     }
-    public String generateAccessToken(@NonNull Credits Credits) {
+    public String generateAccessToken(@NonNull Credentials Credentials) {
         final LocalDateTime now = LocalDateTime.now();
         final Instant accessExpirationInstant = now.plusMinutes(15).atZone(ZoneId.systemDefault()).toInstant();
         final Date accessExpiration = Date.from(accessExpirationInstant);
         return Jwts.builder()
-                .setSubject(Credits.getEmail())
+                .setSubject(Credentials.getEmail())
                 .setExpiration(accessExpiration)
                 .signWith(jwtAccessSecret)
-                .claim("firstName", Credits.getProfile_name())
-                .claim("roles", Credits.getRoles())
+                .claim("firstName", Credentials.getProfile_name())
+                .claim("roles", Credentials.getRoles())
                 .compact();
     }
 
-    public String generateRefreshToken(@NonNull Credits Credits) {
+    public String generateRefreshToken(@NonNull Credentials Credentials) {
         final LocalDateTime now = LocalDateTime.now();
         final Instant refreshExpirationInstant = now.plusDays(30).atZone(ZoneId.systemDefault()).toInstant();
         final Date refreshExpiration = Date.from(refreshExpirationInstant);
         return Jwts.builder()
-                .setSubject(Credits.getEmail())
+                .setSubject(Credentials.getEmail())
                 .setExpiration(refreshExpiration)
                 .signWith(jwtRefreshSecret)
                 .compact();

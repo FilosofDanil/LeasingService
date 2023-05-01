@@ -1,16 +1,12 @@
 package com.example.wohnungsuchen.models;
 
-import com.example.wohnungsuchen.entities.Offers;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.boot.jaxb.hbm.internal.RepresentationModeConverter;
-import org.springframework.hateoas.RepresentationModel;
 
-import java.sql.Date;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -58,4 +54,7 @@ public class OfferModel {
 
     @JsonProperty("image_link")
     private String link;
+
+    @JsonProperty("likes_link")
+    private String likes_link;
 }

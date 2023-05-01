@@ -3,11 +3,15 @@ package com.example.wohnungsuchen.controllers;
 import com.example.wohnungsuchen.auth.JwtRequest;
 import com.example.wohnungsuchen.auth.JwtResponse;
 import com.example.wohnungsuchen.auth.RefreshJwtRequest;
+import com.example.wohnungsuchen.auxiliarymodels.EmailModel;
 import com.example.wohnungsuchen.postmodels.UserPostModel;
 import com.example.wohnungsuchen.services.AuthService;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.security.auth.message.AuthException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -45,4 +49,18 @@ public class AuthController {
         authService.activate(code);
     }
 
+    @PostMapping("send")
+    public void sendActivationCode(@RequestBody EmailModel email){
+        authService.sendActivationCode(email);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ResponseEntity<String> onMethodArgumentNotValidException(
+            MethodArgumentNotValidException e) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(e.getMessage());
+    }
 }

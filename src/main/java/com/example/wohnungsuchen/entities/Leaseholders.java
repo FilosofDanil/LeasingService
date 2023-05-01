@@ -1,10 +1,14 @@
 package com.example.wohnungsuchen.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import net.minidev.json.annotate.JsonIgnore;
+
+import java.util.Set;
 
 @Entity
 @Table(name = "leaseholders")
@@ -19,7 +23,12 @@ public class Leaseholders {
 
     @OneToOne
     @JoinColumn(name = "credit_id", referencedColumnName = "id", nullable = false, unique = true)
-    private Credits credits;
+    @NotNull
+    private Credentials credentials;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "leaseholders", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    Set<Offers> offers;
 
     @Column(name = "firma_name")
     private String firma_name;

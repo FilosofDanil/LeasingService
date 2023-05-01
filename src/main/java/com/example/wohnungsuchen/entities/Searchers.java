@@ -1,10 +1,16 @@
 package com.example.wohnungsuchen.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import net.minidev.json.annotate.JsonIgnore;
+import org.hibernate.validator.constraints.Length;
+
+import java.util.Set;
 
 @Entity
 @Table(name = "searchers")
@@ -19,10 +25,25 @@ public class Searchers {
 
     @OneToOne
     @JoinColumn(name = "credit_id", referencedColumnName = "id", nullable = false, unique = true)
-    private Credits credits;
+    @NotNull
+    private Credentials credentials;
 
     @Column(name = "city")
+    @NotBlank
+    @Length(min = 2)
     private String city;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "searcher", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    Set<Liked> likes;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "searcher", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    Set<Assignments> assignments;
+
+    @Column(name = "notifications", nullable = false)
+    private Boolean notifications;
+
     public Searchers() {
     }
 }
