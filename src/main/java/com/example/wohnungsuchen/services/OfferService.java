@@ -18,7 +18,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
@@ -36,26 +38,29 @@ public class OfferService {
     private final ImagesRepository imagesRepository;
     private final LeaseholdersRepository leaseholdersRepository;
 
-    public List<OfferModel> getAllOffers(String filter, String sort, String direction) throws ParseException {
-        List<Offers> list = doFilter(getOffersList(), detectFiltrationMethods(divideString(filter)), getParametersMap(divideString(filter)));
-        sort(list, sort, direction);
-        return list.stream()
-                .map(OfferMapper::toModel)
-                .collect(Collectors.toList());
-    }
-
-    public List<OfferModel> getAllOffers(String sort, String direction) {
-        List<Offers> list = getOffersList();
-        sort(list, sort, direction);
-        return list.stream()
-                .map(OfferMapper::toModel)
-                .collect(Collectors.toList());
-    }
+//    public List<OfferModel> getAllOffers(String filter, String sort, String direction) throws ParseException {
+//        List<Offers> list = doFilter(getOffersList(), detectFiltrationMethods(divideString(filter)), getParametersMap(divideString(filter)));
+//        sort(list, sort, direction);
+//        return list.stream()
+//                .map(OfferMapper::toModel)
+//                .collect(Collectors.toList());
+//    }
+//
+//    public List<OfferModel> getAllOffers(String sort, String direction) {
+//        List<Offers> list = getOffersList();
+//        sort(list, sort, direction);
+//        return list.stream()
+//                .map(OfferMapper::toModel)
+//                .collect(Collectors.toList());
+//    }
 
     private void sort(List<Offers> list, String sort, String direction) {
         if (sort == null) {
             list.sort(new OfferDateComparator(Direction.DESC));
         } else {
+            if (direction == null) {
+                direction = "DESC";
+            }
             OfferComparatorsFactory offerComparatorsFactory = new OfferComparatorsFactory();
             list.sort(offerComparatorsFactory.getSorter(sort + direction));
         }
@@ -99,6 +104,13 @@ public class OfferService {
         offer.setPost_date(postDate);
         offersRepository.save(offer);
         return OfferMapper.toModel(offer);
+    }
+
+    public OfferModel getOfferById(Long id) {
+        if (offersRepository.findById(id).isEmpty()) {
+            throw new NullPointerException();
+        }
+        return OfferMapper.toModel(offersRepository.findById(id).get());
     }
 
     private List<Offers> doFilter(List<Offers> offers, String[] filter, HashMap<String, String> params) throws ParseException {
@@ -158,8 +170,12 @@ public class OfferService {
                 });
     }
 
-    public void partlyUpdateOffer(Long id, OfferPostModel offer) {
+    public void partlyUpdateOffer(Long id, OfferPostModel offer, Authentication auth) {
         offersRepository.findById(id).map(offers -> {
+            if (!getLeaseholderByName(auth).getId().equals(offers.getLeaseholders().getId())) {
+                throw new RuntimeException();
+            }
+            offers.setLeaseholders(getLeaseholderByName(auth));
             if (offer.getCity() != null) {
                 offers.setCity(offer.getCity());
             }
@@ -195,7 +211,13 @@ public class OfferService {
     }
 
     private Leaseholders getLeaseholderByName(Authentication auth) {
-        String username = (String) auth.getPrincipal();
+        String username;
+        if (auth instanceof UsernamePasswordAuthenticationToken) {
+            User user = (User) auth.getPrincipal();
+            username = user.getUsername();
+        } else {
+            username = (String) auth.getPrincipal();
+        }
         List<Credentials> credentials = new ArrayList<>();
         credentialsRepository.findAll().forEach(credentials::add);
         if (credentials.isEmpty()) {
@@ -229,6 +251,7 @@ public class OfferService {
                     .internet(offer.getInternet())
                     .title(offer.getTitle())
                     .likes_link("http://localhost:8080/api/likes/v1/" + offer.getId())
+                    .self_link("http://localhost:8080/api/v1/offers/" + offer.getId())
                     .build();
         }
 

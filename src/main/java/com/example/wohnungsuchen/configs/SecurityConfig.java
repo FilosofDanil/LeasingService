@@ -1,6 +1,7 @@
 package com.example.wohnungsuchen.configs;
 
 import com.example.wohnungsuchen.auth.JwtFilter;
+import com.example.wohnungsuchen.entities.Credentials;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,5 +35,4 @@ public class SecurityConfig {
                                 .addFilterAfter(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 ).build();
     }
-
 }

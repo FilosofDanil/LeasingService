@@ -1,17 +1,17 @@
-create type roles as enum ('SEARCHER', 'LODGER');
+-- create type roles as enum ('SEARCHER', 'LODGER');
+--
+-- alter type roles owner to postgres;
+-- create sequence hibernate_sequence start 1 increment 1;
 
-alter type roles owner to postgres;
-
-create table if not exists сredentials
+create table if not exists public.сredentials
 (
-    id               bigint
-        primary key,
-    profile_name     varchar(40)  not null,
+    id               bigserial
+        primary key,    profile_name     varchar(40)  not null,
     surname          varchar(40)  not null,
     phone            varchar(20)  not null,
     email            varchar(100) not null,
     profile_password varchar(100) not null,
-    date_of_birth    date         not null,
+    date_of_birth    timestamp(6)         not null,
     verified         boolean,
     activation_code  varchar(100)
 );
@@ -19,9 +19,7 @@ create table if not exists сredentials
 alter table сredentials
     owner to postgres;
 
-alter sequence credits_id_seq owned by сredentials.id;
-
-create table if not exists searchers
+create table if not exists public.searchers
 (
     id            bigserial
         primary key,
@@ -35,7 +33,7 @@ create table if not exists searchers
 alter table searchers
     owner to postgres;
 
-create table if not exists images
+create table if not exists public.images
 (
     id   bigserial
         primary key,
@@ -45,9 +43,9 @@ create table if not exists images
 alter table images
     owner to postgres;
 
-create table if not exists leaseholders
+create table if not exists public.leaseholders
 (
-    id         bigint default nextval('lodgers_id_seq'::regclass) not null
+    id        bigserial  not null
         constraint lodgers_pkey
             primary key,
     credit_id  bigint                                             not null
@@ -59,9 +57,7 @@ create table if not exists leaseholders
 alter table leaseholders
     owner to postgres;
 
-alter sequence lodgers_id_seq owned by leaseholders.id;
-
-create table if not exists credentials_roles
+create table if not exists public.credentials_roles
 (
     id             bigserial
         primary key,
@@ -71,15 +67,15 @@ create table if not exists credentials_roles
     roles          varchar
 );
 
-alter table credentials_roles
+alter table public.credentials_roles
     owner to postgres;
 
-create table if not exists offers
+create table if not exists public.offers
 (
     id             bigserial
         primary key,
     title          varchar(100)     not null,
-    post_date      date             not null,
+    post_date      timestamp(6)             not null,
     cold_arend     double precision not null,
     warm_arend     double precision not null,
     description    text,
@@ -98,10 +94,10 @@ create table if not exists offers
             references leaseholders
 );
 
-alter table offers
+alter table public.offers
     owner to postgres;
 
-create table if not exists liked
+create table if not exists public.liked
 (
     id          bigserial
         primary key,
@@ -116,7 +112,7 @@ create table if not exists liked
 alter table liked
     owner to postgres;
 
-create table if not exists appointments
+create table if not exists public.appointments
 (
     id             bigserial
         primary key,
@@ -126,15 +122,15 @@ create table if not exists appointments
     leaseholder_id bigint not null
         constraint lodger
             references leaseholders,
-    meeting_date   date   not null,
+    meeting_date   timestamp(6)   not null,
     meeting_time   time   not null,
     description    text
 );
 
-alter table appointments
+alter table public.appointments
     owner to postgres;
 
-create table if not exists assignments
+create table if not exists public.assignments
 (
     id             bigserial
         primary key,

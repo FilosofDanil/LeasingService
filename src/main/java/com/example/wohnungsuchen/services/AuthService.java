@@ -1,9 +1,6 @@
 package com.example.wohnungsuchen.services;
 
-import com.example.wohnungsuchen.auth.JwtAuthentication;
-import com.example.wohnungsuchen.auth.JwtProvider;
-import com.example.wohnungsuchen.auth.JwtRequest;
-import com.example.wohnungsuchen.auth.JwtResponse;
+import com.example.wohnungsuchen.auth.*;
 import com.example.wohnungsuchen.auxiliarymodels.EmailModel;
 import com.example.wohnungsuchen.entities.Credentials;
 import com.example.wohnungsuchen.postmodels.UserPostModel;
@@ -11,11 +8,16 @@ import io.jsonwebtoken.Claims;
 import jakarta.security.auth.message.AuthException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -88,7 +90,17 @@ public class AuthService {
     }
 
     public JwtAuthentication getAuthInfo() {
+        if(SecurityContextHolder.getContext().getAuthentication() instanceof UsernamePasswordAuthenticationToken) {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            User username = (User) auth.getPrincipal();
+            String name = auth.getName();
+            java.util.List<Role> roles = (java.util.List<Role>) auth.getAuthorities();
+            Set<Role> setRoles = new HashSet<>();
+            setRoles.addAll(roles);
+            return new JwtAuthentication(username.getUsername(), name, setRoles);
+        }
         return (JwtAuthentication) SecurityContextHolder.getContext().getAuthentication();
+
     }
 
 }

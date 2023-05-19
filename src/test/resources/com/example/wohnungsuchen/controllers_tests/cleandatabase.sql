@@ -1,0 +1,1 @@
+truncate wohnung_suchen_tests.public.сredentials cascade;

@@ -5,6 +5,7 @@ import com.example.wohnungsuchen.services.CredentialsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +17,7 @@ public class CredentialsController {
 
     @DeleteMapping("/{id}")
     public void deleteCredentials(@PathVariable Long id) {
-        credentialsService.deleteCredentials(id);
+        credentialsService.deleteCredentials(id, SecurityContextHolder.getContext().getAuthentication());
     }
 
     @GetMapping("/{id}")

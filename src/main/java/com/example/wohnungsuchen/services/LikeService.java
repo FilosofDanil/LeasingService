@@ -12,7 +12,9 @@ import com.example.wohnungsuchen.repositories.LikedRepository;
 import com.example.wohnungsuchen.repositories.OffersRepository;
 import com.example.wohnungsuchen.repositories.SearchersRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -64,7 +66,13 @@ public class LikeService {
     }
 
     private Searchers getSearcherByName(Authentication auth) {
-        String username = (String) auth.getPrincipal();
+        String username;
+        if (auth instanceof UsernamePasswordAuthenticationToken) {
+            User user = (User) auth.getPrincipal();
+            username = user.getUsername();
+        } else {
+            username = (String) auth.getPrincipal();
+        }
         List<Credentials> credentials = new ArrayList<>();
         credentialsRepository.findAll().forEach(credentials::add);
         if (credentials.isEmpty()) {

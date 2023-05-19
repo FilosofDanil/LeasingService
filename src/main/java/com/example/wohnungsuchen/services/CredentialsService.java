@@ -5,6 +5,7 @@ import com.example.wohnungsuchen.auxiliarymodels.EmailModel;
 import com.example.wohnungsuchen.entities.Credentials;
 import com.example.wohnungsuchen.entities.Leaseholders;
 import com.example.wohnungsuchen.entities.Searchers;
+import com.example.wohnungsuchen.exeptions.AuthException;
 import com.example.wohnungsuchen.exeptions.RegistryException;
 import com.example.wohnungsuchen.exeptions.VerifyException;
 import com.example.wohnungsuchen.models.profilemodels.ProfileLeaseHolderModel;
@@ -18,6 +19,9 @@ import com.example.wohnungsuchen.security.MailSender;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 
@@ -124,9 +128,24 @@ public class CredentialsService {
         return credentials;
     }
 
-    public void deleteCredentials(Long id) {
+    public void deleteCredentials(Long id, Authentication auth) {
         if (credentialsRepository.findById(id).isEmpty()) {
             throw new NotFoundException("Failed to delete");
+        }
+
+        String username;
+        if (auth instanceof UsernamePasswordAuthenticationToken) {
+            User user = (User) auth.getPrincipal();
+            username = user.getUsername();
+        } else {
+            username = (String) auth.getPrincipal();
+        }
+        if (getByLogin(username).isEmpty()) {
+            throw new NullPointerException();
+        }
+        Credentials comparedCredentials = getByLogin(username).get();
+        if (!Objects.equals(comparedCredentials.getId(), id)) {
+            throw new AuthException("Trying to delete not own profile!");
         }
         Credentials credentials = credentialsRepository.findById(id).get();
         leaseholdersRepository.findAll().forEach(leaseholders -> {
