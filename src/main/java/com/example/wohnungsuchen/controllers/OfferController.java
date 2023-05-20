@@ -23,26 +23,31 @@ import java.text.ParseException;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/offers")
+@RequestMapping("api/v1/offers")
 @RequiredArgsConstructor
 public class OfferController {
     private final OfferService offerService;
     private final AuthService authService;
     private final ImageService imageService;
 
-    @GetMapping("/v1")
-    public List<OfferModel> getAllOffers(@RequestParam(required = false) String filter, @RequestParam(required = false) String sort, @RequestParam(required = false) String direction) throws ParseException {
-        final JwtAuthentication authInfo = authService.getAuthInfo();
-        if (filter == null) {
-            return ResponseEntity.ok(offerService.getAllOffers(sort, direction)).getBody();
-        }
-        return ResponseEntity.ok(offerService.getAllOffers(filter, sort, direction)).getBody();
-    }
+//    @GetMapping("/v2")
+//    public List<OfferModel> getAllOffers(@RequestParam(required = false) String filter, @RequestParam(required = false) String sort, @RequestParam(required = false) String direction) throws ParseException {
+//        final JwtAuthentication authInfo = authService.getAuthInfo();
+//        if (filter == null) {
+//            return ResponseEntity.ok(offerService.getAllOffers(sort, direction)).getBody();
+//        }
+//        return ResponseEntity.ok(offerService.getAllOffers(filter, sort, direction)).getBody();
+//    }
 
-    @GetMapping("/v2")
+    @GetMapping("/")
     public Page<OfferModel> getAllOffers(@RequestParam(required = false) String filter, @PageableDefault(size = 5) Pageable pageable, @RequestParam(required = false) String sort, @RequestParam(required = false) String direction) throws ParseException {
         final JwtAuthentication authInfo = authService.getAuthInfo();
         return ResponseEntity.ok(offerService.getAllOffers(pageable, filter, sort, direction)).getBody();
+    }
+
+    @GetMapping("/{id}")
+    public OfferModel getOfferById(@PathVariable Long id) {
+        return ResponseEntity.ok(offerService.getOfferById(id)).getBody();
     }
 
 //    @GetMapping("/v3")
@@ -52,7 +57,7 @@ public class OfferController {
 //    }
 
     @PreAuthorize("hasAuthority('LEASEHOLDER')")
-    @GetMapping("/{leaseholder_id}")
+    @GetMapping("/posted/{leaseholder_id}")
     public List<OfferModel> getAllCreatedOffersByLeaseholder(@PathVariable Long leaseholder_id) {
         return ResponseEntity.ok(offerService.getAllCreatedOffersByLeaseholderId(leaseholder_id)).getBody();
     }
@@ -82,7 +87,7 @@ public class OfferController {
     @PreAuthorize("hasAuthority('LEASEHOLDER')")
     @PatchMapping("/{id}")
     public void partlyUpdateOffer(@PathVariable Long id, @RequestBody OfferPostModel offerPostModel) {
-        offerService.partlyUpdateOffer(id, offerPostModel);
+        offerService.partlyUpdateOffer(id, offerPostModel, SecurityContextHolder.getContext().getAuthentication());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

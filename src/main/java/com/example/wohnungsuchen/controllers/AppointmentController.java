@@ -38,11 +38,18 @@ public class AppointmentController {
     public List<AppointmentModel> getAppointmentsCreatedByCertainLeaseholder(@PathVariable Long id) {
         return ResponseEntity.ok(appointmentService.getAppointmentsCreatedByCertainLeaseholder(id)).getBody();
     }
+//
+//    @PreAuthorize("hasAuthority('LEASEHOLDER')")
+//    @GetMapping("/offer/{id}")
+//    public List<AppointmentModel> getAllAssignmetnts(@PathVariable Long id) {
+//        return ResponseEntity.ok(appointmentService.getAppointmentsCreatedByCertainLeaseholder(id)).getBody();
+//    }
 
     @PreAuthorize("hasAuthority('LEASEHOLDER')")
-    @PatchMapping("/{searchers_id}")
-    public void assignAppointmentToCertainUser(@PathVariable Long searchers_id, @RequestBody String appointment_id) {
+    @PostMapping("/{searchers_id}")
+    public HttpStatus assignAppointmentToCertainUser(@PathVariable Long searchers_id, @RequestBody String appointment_id) {
         appointmentService.assignAppointmentToCertainUser(searchers_id, Long.parseLong(appointment_id));
+        return HttpStatus.CREATED;
     }
 
     @PreAuthorize("hasAuthority('LEASEHOLDER')")

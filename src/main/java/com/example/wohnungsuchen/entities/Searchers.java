@@ -29,7 +29,6 @@ public class Searchers {
     private Credentials credentials;
 
     @Column(name = "city")
-    @NotBlank
     @Length(min = 2)
     private String city;
 

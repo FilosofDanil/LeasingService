@@ -1,5 +1,6 @@
 package com.example.wohnungsuchen.exeptionhandlers;
 
+import com.example.wohnungsuchen.exeptions.AuthException;
 import com.example.wohnungsuchen.exeptions.RegistryException;
 import com.example.wohnungsuchen.exeptions.VerifyException;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -30,6 +31,11 @@ public class ExceptionResolver extends AbstractHandlerExceptionResolver {
             }
             modelAndView.setStatus(HttpStatus.BAD_REQUEST);
             modelAndView.addObject("message", "Resource is not found!");
+            return modelAndView;
+        }
+        if (ex instanceof AuthException) {
+            modelAndView.setStatus(HttpStatus.FORBIDDEN);
+            modelAndView.addObject("message", ex.getMessage());
             return modelAndView;
         }
         if (ex instanceof NullPointerException) {

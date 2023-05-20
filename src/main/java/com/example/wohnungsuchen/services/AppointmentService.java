@@ -1,22 +1,24 @@
 package com.example.wohnungsuchen.services;
 
 import com.example.wohnungsuchen.auxiliarymodels.AppointmentDeleteModel;
-import com.example.wohnungsuchen.entities.Appointments;
-import com.example.wohnungsuchen.entities.Credentials;
-import com.example.wohnungsuchen.entities.Leaseholders;
-import com.example.wohnungsuchen.entities.Searchers;
+import com.example.wohnungsuchen.entities.*;
 import com.example.wohnungsuchen.models.AppointmentModel;
+import com.example.wohnungsuchen.models.profilemodels.InvitedModel;
 import com.example.wohnungsuchen.postmodels.AppointmentPostModel;
 import com.example.wohnungsuchen.repositories.*;
 import com.example.wohnungsuchen.security.MailSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import java.sql.Time;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -117,7 +119,13 @@ public class AppointmentService {
     }
 
     private Leaseholders getLeaseholderByName(Authentication auth) {
-        String username = (String) auth.getPrincipal();
+        String username;
+        if (auth instanceof UsernamePasswordAuthenticationToken) {
+            User user = (User) auth.getPrincipal();
+            username = user.getUsername();
+        } else {
+            username = (String) auth.getPrincipal();
+        }
         List<Credentials> credentials = new ArrayList<>();
         credentialsRepository.findAll().forEach(credentials::add);
         Credentials cred = credentials.stream().filter(credentials1 -> credentials1.getEmail().equals(username)).findFirst().get();
@@ -159,6 +167,8 @@ public class AppointmentService {
 
     static class AppointmentMapper {
         private static AppointmentModel toModel(Appointments appointment) {
+//            Set<InvitedModel> invitedList = new HashSet<>();
+//            Set<Assignments> assignments = appointment.getAssignments();
             return AppointmentModel.builder()
                     .id(appointment.getId())
                     .city(appointment.getOffer().getCity())
