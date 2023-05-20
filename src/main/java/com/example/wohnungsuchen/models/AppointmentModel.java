@@ -1,13 +1,14 @@
 package com.example.wohnungsuchen.models;
 
 import com.example.wohnungsuchen.entities.Searchers;
+//import com.example.wohnungsuchen.models.profilemodels.InvitedModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.util.*;
 import java.sql.Time;
 
 @Getter
@@ -33,4 +34,6 @@ public class AppointmentModel {
     private String city;
     @JsonProperty("address")
     private String address;
+//    @JsonProperty("invited")
+//    private Set<InvitedModel> invitedUsersList;
 }

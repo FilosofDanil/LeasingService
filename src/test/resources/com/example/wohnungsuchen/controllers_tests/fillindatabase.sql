@@ -43,4 +43,18 @@ values (1, 'House of the rising sun', '2023/05/16', 100.0, 250.0, 'Some text', '
 (11, 'House of the rising sun', '2023/05/16', 100.0, 750.0, 'Some text', 'Hamburg', 'Gercena35', 2, 45.0, true,
         true, 11, 1, 1),
 (12, 'House of the rising sun', '2023/05/16', 100.0, 800.0, 'Some text', 'Hamburg', 'Gercena35', 3, 50.0, true,
-        true, 12, 1, 1)
+        true, 12, 1, 1);
+
+insert into appointments(id, offer_id, leaseholder_id, meeting_date, meeting_time, description) VALUES
+(1,1,1,'2023/06/01','12:30:00','Some text'),
+(2,1,1,'2023/06/02','10:30:00','Some text'),
+(3,2,1,'2023/06/04','12:30:00','Some text'),
+(4,3,1,'2023/06/03','14:15:00','Some text'),
+(5,7,1,'2023/06/04','10:00:00','Some text'),
+(6,8,1,'2023/06/01','12:30:00','Some text');
+
+insert into assignments(id, searcher_id, appointment_id) VALUES
+(1, 1, 1),
+(2, 1, 2),
+(3, 1, 3),
+(4, 1, 4)
