@@ -1,4 +1,4 @@
-package com.example.wohnungsuchen.security;
+package com.example.wohnungsuchen.services.security;
 
 import com.example.wohnungsuchen.repositories.CredentialsRepository;
 import lombok.RequiredArgsConstructor;

@@ -1,13 +1,14 @@
 package com.example.wohnungsuchen.services;
 
 import com.example.wohnungsuchen.auth.Role;
-import com.example.wohnungsuchen.auxiliarymodels.EmailModel;
+import com.example.wohnungsuchen.models.auxiliarymodels.EmailModel;
 import com.example.wohnungsuchen.entities.Credentials;
 import com.example.wohnungsuchen.entities.Leaseholders;
 import com.example.wohnungsuchen.entities.Searchers;
 import com.example.wohnungsuchen.exeptions.AuthException;
 import com.example.wohnungsuchen.exeptions.RegistryException;
 import com.example.wohnungsuchen.exeptions.VerifyException;
+import com.example.wohnungsuchen.models.profilemodels.InvitedModel;
 import com.example.wohnungsuchen.models.profilemodels.ProfileLeaseHolderModel;
 import com.example.wohnungsuchen.models.profilemodels.ProfileModel;
 import com.example.wohnungsuchen.models.profilemodels.ProfileSearcherModel;
@@ -15,7 +16,7 @@ import com.example.wohnungsuchen.postmodels.UserPostModel;
 import com.example.wohnungsuchen.repositories.CredentialsRepository;
 import com.example.wohnungsuchen.repositories.LeaseholdersRepository;
 import com.example.wohnungsuchen.repositories.SearchersRepository;
-import com.example.wohnungsuchen.security.MailSender;
+import com.example.wohnungsuchen.services.security.MailSender;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -176,7 +178,24 @@ public class CredentialsService {
         return UserMapper.toProfileModel(credentials, o);
     }
 
+    public List<InvitedModel> getProfilesAssignedToCertainAppointment(Integer appointmentId) {
+        List<Credentials> credentialsList = new ArrayList<>();
+        searchersRepository.findAllByAssignments(appointmentId).forEach(searchers -> {
+            credentialsList.add(searchers.getCredentials());
+        });
+        return credentialsList.stream().map(UserMapper::toInvitedModel).collect(Collectors.toList());
+    }
+
     static class UserMapper {
+        private static InvitedModel toInvitedModel(Credentials credentials) {
+            return InvitedModel.builder()
+                    .email(credentials.getEmail())
+                    .phone(credentials.getPhone())
+                    .name(credentials.getProfile_name())
+                    .surname(credentials.getSurname())
+                    .build();
+        }
+
         //        private static User format(Credentials credentials){
 //            return User.builder()
 //                    .profile_name(credentials.getProfile_name())

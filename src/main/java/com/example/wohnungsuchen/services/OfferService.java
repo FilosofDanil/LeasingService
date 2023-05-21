@@ -3,17 +3,19 @@ package com.example.wohnungsuchen.services;
 import com.example.wohnungsuchen.entities.Credentials;
 import com.example.wohnungsuchen.entities.Leaseholders;
 import com.example.wohnungsuchen.entities.Offers;
-import com.example.wohnungsuchen.filters.FilterFactory;
-import com.example.wohnungsuchen.filters.IFilter;
 import com.example.wohnungsuchen.models.OfferModel;
 import com.example.wohnungsuchen.postmodels.OfferPostModel;
 import com.example.wohnungsuchen.repositories.CredentialsRepository;
 import com.example.wohnungsuchen.repositories.ImagesRepository;
 import com.example.wohnungsuchen.repositories.LeaseholdersRepository;
 import com.example.wohnungsuchen.repositories.OffersRepository;
-import com.example.wohnungsuchen.sorters.offersorters.Direction;
-import com.example.wohnungsuchen.sorters.offersorters.OfferComparatorsFactory;
-import com.example.wohnungsuchen.sorters.offersorters.OfferDateComparator;
+import com.example.wohnungsuchen.services.filters.FilterAssistant;
+import com.example.wohnungsuchen.services.filters.QueryFilterFactory;
+import com.example.wohnungsuchen.services.offersorters.Direction;
+import com.example.wohnungsuchen.services.offersorters.OfferComparatorsFactory;
+import com.example.wohnungsuchen.services.offersorters.OfferDateComparator;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -24,10 +26,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,6 +36,9 @@ public class OfferService {
     private final CredentialsRepository credentialsRepository;
     private final ImagesRepository imagesRepository;
     private final LeaseholdersRepository leaseholdersRepository;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
 //    public List<OfferModel> getAllOffers(String filter, String sort, String direction) throws ParseException {
 //        List<Offers> list = doFilter(getOffersList(), detectFiltrationMethods(divideString(filter)), getParametersMap(divideString(filter)));
@@ -54,17 +56,17 @@ public class OfferService {
 //                .collect(Collectors.toList());
 //    }
 
-    private void sort(List<Offers> list, String sort, String direction) {
-        if (sort == null) {
-            list.sort(new OfferDateComparator(Direction.DESC));
-        } else {
-            if (direction == null) {
-                direction = "DESC";
-            }
-            OfferComparatorsFactory offerComparatorsFactory = new OfferComparatorsFactory();
-            list.sort(offerComparatorsFactory.getSorter(sort + direction));
-        }
-    }
+//    private void sort(List<Offers> list, String sort, String direction) {
+//        if (sort == null) {
+//            list.sort(new OfferDateComparator(Direction.DESC));
+//        } else {
+//            if (direction == null) {
+//                direction = "DESC";
+//            }
+//            OfferComparatorsFactory offerComparatorsFactory = new OfferComparatorsFactory();
+//            list.sort(offerComparatorsFactory.getSorter(sort + direction));
+//        }
+//    }
 
 //    public Page<OfferModel> getAllOffersPage(Pageable pageable) {
 //        return offersRepository.findAll(pageable).map(OfferMapper::toModel);
@@ -79,17 +81,59 @@ public class OfferService {
     }
 
     public Page<OfferModel> getAllOffers(Pageable pageable, String filter, String sort, String direction) throws ParseException {
-        List<Offers> list = getOffersList();
-        if (filter != null) {
-            list = doFilter(list, detectFiltrationMethods(divideString(filter)), getParametersMap(divideString(filter)));
-        }
-        sort(list, sort, direction);
+        String query = buildQuery(filter, sort, direction);
+        List<Offers> list = entityManager.createNativeQuery(query, Offers.class).getResultList();
         List<OfferModel> offerModelList = list.stream()
                 .map(OfferMapper::toModel)
                 .skip((long) pageable.getPageSize() * pageable.getPageNumber())
                 .limit(pageable.getPageSize())
                 .collect(Collectors.toList());
         return new PageImpl<>(offerModelList, pageable, offerModelList.size());
+    }
+
+    private String buildQuery(String filter, String sort, String direction) {
+        StringBuilder queryBuilder = new StringBuilder("select * from offers");
+        if (filter != null) {
+            queryBuilder.append(filter(detectFiltrationMethods(divideString(filter)), getParametersMap(divideString(filter))));
+        }
+        queryBuilder.append(sort(sort, direction));
+        return queryBuilder.toString();
+    }
+
+    private String filter(String[] methods, HashMap<String, String> parametrsMap) {
+        StringBuilder queryBuilder = new StringBuilder();
+        queryBuilder.append(" where ");
+        QueryFilterFactory filterFactory = new QueryFilterFactory();
+        List<String> methodsList = Arrays.asList(methods);
+        List<String> toAppend = new ArrayList<>();
+        for (Iterator iterator = methodsList.listIterator(); iterator.hasNext(); ) {
+            String filter = iterator.next().toString();
+            toAppend.add(filter);
+            FilterAssistant assistant = filterFactory.getFilter(filter);
+            toAppend.add(assistant.getQuery());
+            for (String s : assistant.getParametersList()) {
+                toAppend.add(parametrsMap.get(s));
+                toAppend.add(" and ");
+            }
+        }
+        for (int i = 0; i < toAppend.size() - 1; i++) {
+            queryBuilder.append(toAppend.get(i));
+        }
+
+        return queryBuilder.toString();
+    }
+
+    private String sort(String sort, String direction) {
+        StringBuilder queryBuilder = new StringBuilder();
+        queryBuilder.append(" order by ");
+        if (sort != null) {
+            queryBuilder.append(sort).append(" ");
+            queryBuilder.append(direction);
+        } else {
+            queryBuilder.append("post_date");
+            queryBuilder.append(" desc");
+        }
+        return queryBuilder.toString();
     }
 
     public OfferModel addOffer(OfferPostModel offerPostModel, Authentication auth) {
@@ -113,14 +157,14 @@ public class OfferService {
         return OfferMapper.toModel(offersRepository.findById(id).get());
     }
 
-    private List<Offers> doFilter(List<Offers> offers, String[] filter, HashMap<String, String> params) throws ParseException {
-        FilterFactory filterFactory = new FilterFactory();
-        for (String s : filter) {
-            IFilter filterImpl = filterFactory.getFilter(s);
-            offers = filterImpl.doFilter(params, offers);
-        }
-        return offers;
-    }
+//    private List<Offers> doFilter(List<Offers> offers, String[] filter, HashMap<String, String> params) throws ParseException {
+//        FilterFactory filterFactory = new FilterFactory();
+//        for (String s : filter) {
+//            IFilter filterImpl = filterFactory.getFilter(s);
+//            offers = filterImpl.doFilter(params, offers);
+//        }
+//        return offers;
+//    }
 
     private HashMap<String, String> getParametersMap(String[] s) {
         HashMap<String, String> map = new HashMap<>();

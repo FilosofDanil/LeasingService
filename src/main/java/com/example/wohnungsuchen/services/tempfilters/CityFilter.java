@@ -1,18 +1,21 @@
-package com.example.wohnungsuchen.filters;
+package com.example.wohnungsuchen.services.tempfilters;
 
 import com.example.wohnungsuchen.entities.Offers;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class RoomsFilter implements IFilter {
+@Setter
+@Getter
+public class CityFilter implements IFilter {
     @Override
     public List<Offers> doFilter(HashMap<String, String> params, List<Offers> offers) {
-        Integer roomsFrom = Integer.parseInt(params.get("roomsFrom"));
-        Integer roomsTo = Integer.parseInt(params.get("roomsTo"));
+        String city = params.get("city");
         return offers.stream()
-                .filter(offer -> offer.getRooms() <= roomsTo && offer.getRooms() >= roomsFrom)
+                .filter(offer -> offer.getCity().equals(city))
                 .collect(Collectors.toList());
     }
 }

@@ -1,4 +1,4 @@
-package com.example.wohnungsuchen.auxiliarymodels;
+package com.example.wohnungsuchen.models.auxiliarymodels;
 
 import com.example.wohnungsuchen.entities.Offers;
 import com.fasterxml.jackson.annotation.JsonProperty;
