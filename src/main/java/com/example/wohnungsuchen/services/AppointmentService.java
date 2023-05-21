@@ -1,12 +1,11 @@
 package com.example.wohnungsuchen.services;
 
-import com.example.wohnungsuchen.auxiliarymodels.AppointmentDeleteModel;
+import com.example.wohnungsuchen.models.auxiliarymodels.AppointmentDeleteModel;
 import com.example.wohnungsuchen.entities.*;
 import com.example.wohnungsuchen.models.AppointmentModel;
-import com.example.wohnungsuchen.models.profilemodels.InvitedModel;
 import com.example.wohnungsuchen.postmodels.AppointmentPostModel;
 import com.example.wohnungsuchen.repositories.*;
-import com.example.wohnungsuchen.security.MailSender;
+import com.example.wohnungsuchen.services.security.MailSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,9 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Time;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,17 +34,24 @@ public class AppointmentService {
     }
 
     public List<AppointmentModel> getAppointmentsAssignedToCertainUser(Long id) {
-        return getAppointmentList()
+        if (searchersRepository.findById(id).isEmpty()) {
+            throw new NullPointerException();
+        }
+        return appointmentsRepository.findAppointmentsBySearchers(searchersRepository.findById(id).get())
                 .stream()
-                .filter(appointmentModel -> appointmentModel.getSearchers().contains(searchersRepository.findById(id).get()))
+//                .filter(appointmentModel -> appointmentModel.getSearchers().contains(searchersRepository.findById(id).get()))
                 .map(AppointmentMapper::toModel)
                 .collect(Collectors.toList());
 
     }
 
     public List<AppointmentModel> getAppointmentsCreatedByCertainLeaseholder(Long id) {
-        return getAppointmentList().stream()
-                .filter(appointment -> appointment.getLeaseholder().getId().equals(id))
+        if (leaseholdersRepository.findById(id).isEmpty()) {
+            throw new NullPointerException();
+        }
+        return appointmentsRepository.findAppointmentsByLeaseholder(leaseholdersRepository.findById(id).get())
+                .stream()
+//                .filter(appointment -> appointment.getLeaseholder().getId().equals(id))
                 .map(AppointmentMapper::toModel)
                 .collect(Collectors.toList());
     }

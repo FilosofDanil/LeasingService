@@ -1,4 +1,4 @@
-package com.example.wohnungsuchen.security;
+package com.example.wohnungsuchen.services.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

@@ -4,7 +4,7 @@ import com.example.wohnungsuchen.entities.Appointments;
 import com.example.wohnungsuchen.entities.Credentials;
 import com.example.wohnungsuchen.repositories.AppointmentsRepository;
 import com.example.wohnungsuchen.repositories.AssignmentRepository;
-import com.example.wohnungsuchen.security.MailSender;
+import com.example.wohnungsuchen.services.security.MailSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;

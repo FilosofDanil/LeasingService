@@ -1,4 +1,4 @@
-package com.example.wohnungsuchen.filters;
+package com.example.wohnungsuchen.services.tempfilters;
 
 import com.example.wohnungsuchen.entities.Offers;
 

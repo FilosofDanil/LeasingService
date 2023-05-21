@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.AbstractHandlerExceptionResolver;
@@ -66,6 +67,11 @@ public class ExceptionResolver extends AbstractHandlerExceptionResolver {
         if (ex instanceof ConstraintViolationException) {
             modelAndView.setStatus(HttpStatus.BAD_REQUEST);
             modelAndView.addObject("message", "Invalid request data!");
+            return modelAndView;
+        }
+        if(ex instanceof AccessDeniedException){
+            modelAndView.setStatus(HttpStatus.FORBIDDEN);
+            modelAndView.addObject("message", ex.getMessage());
             return modelAndView;
         }
         if (ex instanceof IOException) {

@@ -1,7 +1,6 @@
 package com.example.wohnungsuchen.controllers;
 
-import com.example.wohnungsuchen.auxiliarymodels.AppointmentDeleteModel;
-import com.example.wohnungsuchen.entities.Appointments;
+import com.example.wohnungsuchen.models.auxiliarymodels.AppointmentDeleteModel;
 import com.example.wohnungsuchen.models.AppointmentModel;
 import com.example.wohnungsuchen.postmodels.AppointmentPostModel;
 import com.example.wohnungsuchen.services.AppointmentService;

@@ -1,4 +1,4 @@
-package com.example.wohnungsuchen.sorters.offersorters;
+package com.example.wohnungsuchen.services.offersorters;
 
 import com.example.wohnungsuchen.entities.Offers;
 

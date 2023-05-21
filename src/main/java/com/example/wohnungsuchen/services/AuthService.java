@@ -1,7 +1,7 @@
 package com.example.wohnungsuchen.services;
 
 import com.example.wohnungsuchen.auth.*;
-import com.example.wohnungsuchen.auxiliarymodels.EmailModel;
+import com.example.wohnungsuchen.models.auxiliarymodels.EmailModel;
 import com.example.wohnungsuchen.entities.Credentials;
 import com.example.wohnungsuchen.postmodels.UserPostModel;
 import io.jsonwebtoken.Claims;

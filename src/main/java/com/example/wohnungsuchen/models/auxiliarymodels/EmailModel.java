@@ -1,4 +1,4 @@
-package com.example.wohnungsuchen.auxiliarymodels;
+package com.example.wohnungsuchen.models.auxiliarymodels;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

@@ -51,7 +51,7 @@ insert into appointments(id, offer_id, leaseholder_id, meeting_date, meeting_tim
 (3,2,1,'2023/06/04','12:30:00','Some text'),
 (4,3,1,'2023/06/03','14:15:00','Some text'),
 (5,7,1,'2023/06/04','10:00:00','Some text'),
-(6,8,1,'2023/06/01','12:30:00','Some text');
+(6,8,1,'2023/05/01','12:30:00','Some text');
 
 insert into assignments(id, searcher_id, appointment_id) VALUES
 (1, 1, 1),
