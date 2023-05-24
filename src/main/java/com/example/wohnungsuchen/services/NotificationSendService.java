@@ -22,7 +22,7 @@ public class NotificationSendService {
     @Autowired
     private MailSender mailSender;
 
-    @Scheduled(cron = "@hourly")
+    @Scheduled(fixedDelay = 10000)
     public void remindAll() {
         appointmentsRepository.findAll().forEach(appointments -> {
             if (pastEvent(appointments)) {
@@ -61,7 +61,7 @@ public class NotificationSendService {
         Date date = new Date();
         Calendar currentDate = Calendar.getInstance();
         currentDate.setTime(date);
-        return additionDateAndTime(appointments).getTime().getDate() - currentDate.getTime().getDate() <= 1;
+        return additionDateAndTime(appointments).getTime().getTime() - currentDate.getTime().getTime() <= 86400000;
     }
 
     private Calendar additionDateAndTime(Appointments appointments) {
