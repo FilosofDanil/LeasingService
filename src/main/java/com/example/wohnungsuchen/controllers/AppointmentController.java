@@ -37,12 +37,6 @@ public class AppointmentController {
     public List<AppointmentModel> getAppointmentsCreatedByCertainLeaseholder(@PathVariable Long id) {
         return ResponseEntity.ok(appointmentService.getAppointmentsCreatedByCertainLeaseholder(id)).getBody();
     }
-//
-//    @PreAuthorize("hasAuthority('LEASEHOLDER')")
-//    @GetMapping("/offer/{id}")
-//    public List<AppointmentModel> getAllAssignmetnts(@PathVariable Long id) {
-//        return ResponseEntity.ok(appointmentService.getAppointmentsCreatedByCertainLeaseholder(id)).getBody();
-//    }
 
     @PreAuthorize("hasAuthority('LEASEHOLDER')")
     @PostMapping("/{searchers_id}")

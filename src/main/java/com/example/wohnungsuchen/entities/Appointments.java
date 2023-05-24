@@ -1,5 +1,6 @@
 package com.example.wohnungsuchen.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -51,6 +52,7 @@ public class Appointments {
     @Column(name = "description", nullable = true)
     private String description;
     @JsonIgnore
+    @JsonBackReference
     @OneToMany(mappedBy = "appointment", cascade = CascadeType.REMOVE, orphanRemoval = true)
     Set<Assignments> assignments;
 

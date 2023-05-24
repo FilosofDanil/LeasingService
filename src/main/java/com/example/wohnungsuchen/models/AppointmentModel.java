@@ -34,6 +34,4 @@ public class AppointmentModel {
     private String city;
     @JsonProperty("address")
     private String address;
-//    @JsonProperty("invited")
-//    private Set<InvitedModel> invitedUsersList;
 }

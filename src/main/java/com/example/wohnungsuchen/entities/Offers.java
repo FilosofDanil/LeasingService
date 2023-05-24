@@ -1,5 +1,6 @@
 package com.example.wohnungsuchen.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -75,10 +76,12 @@ public class Offers {
     @NotNull
     private Leaseholders leaseholders;
     @JsonIgnore
+    @JsonBackReference
     @OneToMany(mappedBy = "offer", cascade = CascadeType.REMOVE, orphanRemoval = true)
     Set<Liked> likes;
 
     @JsonIgnore
+    @JsonBackReference
     @OneToMany(mappedBy = "offer", cascade = CascadeType.REMOVE, orphanRemoval = true)
     Set<Appointments> appointments;
 

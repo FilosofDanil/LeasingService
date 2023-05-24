@@ -30,15 +30,6 @@ public class OfferController {
     private final AuthService authService;
     private final ImageService imageService;
 
-//    @GetMapping("/v2")
-//    public List<OfferModel> getAllOffers(@RequestParam(required = false) String filter, @RequestParam(required = false) String sort, @RequestParam(required = false) String direction) throws ParseException {
-//        final JwtAuthentication authInfo = authService.getAuthInfo();
-//        if (filter == null) {
-//            return ResponseEntity.ok(offerService.getAllOffers(sort, direction)).getBody();
-//        }
-//        return ResponseEntity.ok(offerService.getAllOffers(filter, sort, direction)).getBody();
-//    }
-
     @GetMapping("/")
     public Page<OfferModel> getAllOffers(@RequestParam(required = false) String filter, @PageableDefault(size = 5) Pageable pageable, @RequestParam(required = false) String sort, @RequestParam(required = false) String direction) throws ParseException {
         final JwtAuthentication authInfo = authService.getAuthInfo();
@@ -49,12 +40,6 @@ public class OfferController {
     public OfferModel getOfferById(@PathVariable Long id) {
         return ResponseEntity.ok(offerService.getOfferById(id)).getBody();
     }
-
-//    @GetMapping("/v3")
-//    public Page<OfferModel> getAllOffers(@RequestParam(required = false) String sort, @RequestParam(required = false) String direction, @PageableDefault(size = 5, sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) throws ParseException {
-//        final JwtAuthentication authInfo = authService.getAuthInfo();
-//        return ResponseEntity.ok(offerService.getAllOffersPage(pageable)).getBody();
-//    }
 
     @PreAuthorize("hasAuthority('LEASEHOLDER')")
     @GetMapping("/posted/{leaseholder_id}")

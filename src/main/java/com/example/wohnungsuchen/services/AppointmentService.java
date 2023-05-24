@@ -39,10 +39,8 @@ public class AppointmentService {
         }
         return appointmentsRepository.findAppointmentsBySearchers(searchersRepository.findById(id).get())
                 .stream()
-//                .filter(appointmentModel -> appointmentModel.getSearchers().contains(searchersRepository.findById(id).get()))
                 .map(AppointmentMapper::toModel)
                 .collect(Collectors.toList());
-
     }
 
     public List<AppointmentModel> getAppointmentsCreatedByCertainLeaseholder(Long id) {
@@ -51,7 +49,6 @@ public class AppointmentService {
         }
         return appointmentsRepository.findAppointmentsByLeaseholder(leaseholdersRepository.findById(id).get())
                 .stream()
-//                .filter(appointment -> appointment.getLeaseholder().getId().equals(id))
                 .map(AppointmentMapper::toModel)
                 .collect(Collectors.toList());
     }
@@ -171,8 +168,6 @@ public class AppointmentService {
 
     static class AppointmentMapper {
         private static AppointmentModel toModel(Appointments appointment) {
-//            Set<InvitedModel> invitedList = new HashSet<>();
-//            Set<Assignments> assignments = appointment.getAssignments();
             return AppointmentModel.builder()
                     .id(appointment.getId())
                     .city(appointment.getOffer().getCity())

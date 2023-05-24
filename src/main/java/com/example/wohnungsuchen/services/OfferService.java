@@ -11,9 +11,6 @@ import com.example.wohnungsuchen.repositories.LeaseholdersRepository;
 import com.example.wohnungsuchen.repositories.OffersRepository;
 import com.example.wohnungsuchen.services.filters.FilterAssistant;
 import com.example.wohnungsuchen.services.filters.QueryFilterFactory;
-import com.example.wohnungsuchen.services.offersorters.Direction;
-import com.example.wohnungsuchen.services.offersorters.OfferComparatorsFactory;
-import com.example.wohnungsuchen.services.offersorters.OfferDateComparator;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
@@ -39,38 +36,6 @@ public class OfferService {
 
     @PersistenceContext
     private EntityManager entityManager;
-
-//    public List<OfferModel> getAllOffers(String filter, String sort, String direction) throws ParseException {
-//        List<Offers> list = doFilter(getOffersList(), detectFiltrationMethods(divideString(filter)), getParametersMap(divideString(filter)));
-//        sort(list, sort, direction);
-//        return list.stream()
-//                .map(OfferMapper::toModel)
-//                .collect(Collectors.toList());
-//    }
-//
-//    public List<OfferModel> getAllOffers(String sort, String direction) {
-//        List<Offers> list = getOffersList();
-//        sort(list, sort, direction);
-//        return list.stream()
-//                .map(OfferMapper::toModel)
-//                .collect(Collectors.toList());
-//    }
-
-//    private void sort(List<Offers> list, String sort, String direction) {
-//        if (sort == null) {
-//            list.sort(new OfferDateComparator(Direction.DESC));
-//        } else {
-//            if (direction == null) {
-//                direction = "DESC";
-//            }
-//            OfferComparatorsFactory offerComparatorsFactory = new OfferComparatorsFactory();
-//            list.sort(offerComparatorsFactory.getSorter(sort + direction));
-//        }
-//    }
-
-//    public Page<OfferModel> getAllOffersPage(Pageable pageable) {
-//        return offersRepository.findAll(pageable).map(OfferMapper::toModel);
-//    }
 
     public List<OfferModel> getAllCreatedOffersByLeaseholderId(Long leaseholder_id) {
         return getOffersList()
@@ -156,15 +121,6 @@ public class OfferService {
         }
         return OfferMapper.toModel(offersRepository.findById(id).get());
     }
-
-//    private List<Offers> doFilter(List<Offers> offers, String[] filter, HashMap<String, String> params) throws ParseException {
-//        FilterFactory filterFactory = new FilterFactory();
-//        for (String s : filter) {
-//            IFilter filterImpl = filterFactory.getFilter(s);
-//            offers = filterImpl.doFilter(params, offers);
-//        }
-//        return offers;
-//    }
 
     private HashMap<String, String> getParametersMap(String[] s) {
         HashMap<String, String> map = new HashMap<>();

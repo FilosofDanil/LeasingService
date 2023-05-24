@@ -196,14 +196,6 @@ public class CredentialsService {
                     .build();
         }
 
-        //        private static User format(Credentials credentials){
-//            return User.builder()
-//                    .profile_name(credentials.getProfile_name())
-//                    .profile_password(credentials.getPassword())
-//                    .surname(credentials.getSurname())
-//                    .email(credentials.getEmail())
-//                    .build();
-//        }
         private static Credentials toCredits(UserPostModel user) {
             return Credentials.builder()
                     .profile_name(user.getProfile_name())
